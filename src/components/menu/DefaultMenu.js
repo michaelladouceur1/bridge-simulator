@@ -1,11 +1,12 @@
 import React, { useContext } from "react";
-
-import { ElementsContext } from "../../contexts/ElementsContext";
-
 import { BiRadioCircle } from "react-icons/bi";
 import { GiSpawnNode } from "react-icons/gi";
 import { AiOutlineLine } from "react-icons/ai";
 import { FaTrashAlt } from "react-icons/fa";
+
+import { ElementsContext } from "../../contexts/ElementsContext";
+
+import { Button } from "../Button";
 
 import "./DefaultMenu.scss";
 
@@ -15,25 +16,29 @@ export const DefaultMenu = (props) => {
   return (
     <div className="default-menu">
       <div className="elements">
-        <button>
+        {/* <button>
           <BiRadioCircle />
-        </button>
-        <button>
+        </button> */}
+        <Button tooltip="Add Connection">
+          <BiRadioCircle />
+        </Button>
+        <Button tooltip="Add Beam">
           <AiOutlineLine />
-        </button>
-        <button>
+        </Button>
+        <Button tooltip="Add Support">
           <GiSpawnNode />
-        </button>
+        </Button>
       </div>
       <div className="edit">
-        <button
+        <Button
+          tooltip="Clear"
           onClick={() => {
             setConnections([]);
             setBeams([]);
           }}
         >
           <FaTrashAlt />
-        </button>
+        </Button>
       </div>
     </div>
   );
