@@ -2,8 +2,10 @@ import React, { useState, useLayoutEffect } from "react";
 
 import "./Canvas.css";
 
+// Parameters
 const radius = 5;
 
+// Connection element
 function Connection(id, x, y) {
   this.id = id;
   this.x = x;
@@ -37,15 +39,29 @@ function Connection(id, x, y) {
   };
 }
 
+// Alignment element
 function Alignment(element, mouse) {
   this.element = element;
   this.mouse = mouse;
 
   this.draw = function (ctx) {
+    let xOffset = 0;
+    let yOffset = 0;
+
     ctx.beginPath();
-    ctx.moveTo(this.element.displayX, this.element.displayY);
+    if (this.element.displayX === this.mouse.x) {
+      yOffset =
+        this.element.displayY > this.mouse.y ? -(radius * 2) : radius * 2;
+    } else {
+      xOffset =
+        this.element.displayX > this.mouse.x ? -(radius * 2) : radius * 2;
+    }
+    ctx.moveTo(
+      this.element.displayX + xOffset,
+      this.element.displayY + yOffset
+    );
     ctx.lineTo(this.mouse.x, this.mouse.y);
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 0.5;
     ctx.stroke();
     ctx.closePath();
   };
@@ -93,6 +109,7 @@ export const Canvas = (props) => {
     const { clientX, clientY } = event;
     setMouse({ x: clientX, y: clientY });
 
+    // Check if the mouse is hovering over the same position as a connection element
     const handleElementHover = () => {
       // Initialize hovered function for checking if the mouse is hovered over a connection element
       const hovered = (el) => {
@@ -108,8 +125,8 @@ export const Canvas = (props) => {
       setElementHover(connections.some(hovered));
     };
 
+    // Check if the mouse coords align with any of the connection elements coords
     const handleConnectionAlignment = () => {
-      // Check if any connections on the screen coords align with the mouse coords
       for (const connection of connections) {
         // Find if checked connection exists in alignments
         const alignmentConnection = alignments.find(
