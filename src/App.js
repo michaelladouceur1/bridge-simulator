@@ -1,16 +1,19 @@
 import React, { useState } from "react";
 
+import { ThemeContextProvider } from "./contexts/ThemeContext";
+import { ElementsContextProvider } from "./contexts/ElementsContext";
+
 import { Canvas } from "./components/Canvas";
-import { Menu } from "./components/Menu";
+import { Menu } from "./components/menu/Menu";
 import "./App.css";
 
-export const App = (props) => {
-  const [elementType, setElementType] = useState("connection");
-
+export const App = () => {
   return (
-    <>
-      <Menu setElementType={setElementType} />
-      <Canvas elementType={elementType} />
-    </>
+    <ElementsContextProvider>
+      <ThemeContextProvider>
+        <Menu />
+        <Canvas />
+      </ThemeContextProvider>
+    </ElementsContextProvider>
   );
 };

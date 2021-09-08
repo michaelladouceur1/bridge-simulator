@@ -1,0 +1,19 @@
+.default-menu {
+  display: grid;
+  grid-template-rows: 1fr 70px;
+  height: 100%;
+  width: 100%;
+
+  .elements {
+    padding: 10px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .edit {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+  }
+}

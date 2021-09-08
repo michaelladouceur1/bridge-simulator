@@ -1,0 +1,32 @@
+.default-menu {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-rows: 1fr 70px;
+      grid-template-rows: 1fr 70px;
+  height: 100%;
+  width: 100%;
+}
+
+.default-menu .elements {
+  padding: 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+
+.default-menu .edit {
+  padding: 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+/*# sourceMappingURL=DefaultMenu.css.map */

@@ -1,4 +1,5 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect, useContext } from "react";
+import { ElementsContext } from "../contexts/ElementsContext";
 
 import "./Canvas.css";
 
@@ -67,12 +68,11 @@ function Alignment(element, mouse) {
   };
 }
 
-export const Canvas = (props) => {
-  const { elementType } = props;
+export const Canvas = () => {
+  const { elementType, connections, setConnections, beams, setBeams } =
+    useContext(ElementsContext);
 
   const [mouse, setMouse] = useState({ x: undefined, y: undefined });
-  const [connections, setConnections] = useState([]);
-  const [beams, setBeams] = useState([]);
   const [alignments, setAlignments] = useState([]);
   const [elementHover, setElementHover] = useState(false);
 
