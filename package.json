@@ -1,0 +1,30 @@
+{
+  "name": "bridge-simulator",
+  "version": "1.0.0",
+  "description": "A bridge simulator app to compare different bridge designs and compete against other users",
+  "main": "index.js",
+  "scripts": {
+    "start:react": "react-scripts start",
+    "test": "test"
+  },
+  "author": "Michael LaDouceur",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-icons": "^4.2.0",
+    "react-scripts": "^4.0.3"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
