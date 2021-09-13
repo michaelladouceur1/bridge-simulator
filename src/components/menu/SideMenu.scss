@@ -1,0 +1,16 @@
+@import "./Menu.scss";
+
+.side-menu {
+  display: grid;
+  grid-template-rows: repeat(3, 1fr);
+  opacity: 0;
+  background: transparent;
+  width: 0;
+  height: $main-menu-height;
+  transition: $transition-speed;
+
+  &.side-expanded {
+    opacity: 1;
+    width: $side-menu-width;
+  }
+}

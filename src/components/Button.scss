@@ -1,6 +1,38 @@
 button {
   position: relative;
-  margin: 0;
+  margin: auto;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #141414;
+  color: #b8b8b8;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+
+  &:hover {
+    color: #1f1f1f;
+    cursor: pointer;
+
+    svg {
+      fill: #1f1f1f;
+    }
+  }
+
+  &.active {
+    background: lightblue;
+    transition: opacity 0.3s;
+
+    svg {
+      fill: #1f1f1f;
+    }
+  }
+
+  svg {
+    font-size: 1.5rem;
+    fill: #b8b8b8;
+  }
 
   .tooltip {
     position: absolute;
@@ -11,7 +43,6 @@ button {
     border-bottom: 1px dotted black;
     background-color: black;
     color: #fff;
-    max-width: 150px;
     font-size: 0.6rem;
     white-space: nowrap;
 
@@ -27,14 +58,15 @@ button {
 
   .visible {
     display: flex;
+    visibility: visible;
     opacity: 1;
-    transition: 0.3s, z-index 0s;
+    transition: opacity 0.1s;
     transition-delay: 1.5s;
     z-index: 1;
   }
 
   .hidden {
-    // display: none;
+    visibility: hidden;
     opacity: 0;
     z-index: -1;
   }

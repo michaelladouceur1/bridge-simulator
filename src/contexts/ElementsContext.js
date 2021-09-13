@@ -6,6 +6,7 @@ export const ElementsContextProvider = ({ children }) => {
   const [elementType, setElementType] = useState("connection");
   const [connections, setConnections] = useState([]);
   const [beams, setBeams] = useState([]);
+  const [supports, setSupports] = useState([]);
 
   return (
     <ElementsContext.Provider
@@ -16,6 +17,8 @@ export const ElementsContextProvider = ({ children }) => {
         setConnections,
         beams,
         setBeams,
+        supports,
+        setSupports,
       }}
     >
       {children}

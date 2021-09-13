@@ -93,22 +93,4 @@
   bottom: -1.25rem;
   left: 0;
 }
-
-.side-menu {
-  display: -ms-grid;
-  display: grid;
-  -ms-grid-rows: (1fr)[3];
-      grid-template-rows: repeat(3, 1fr);
-  opacity: 0;
-  background: transparent;
-  width: 0;
-  height: 200px;
-  -webkit-transition: 0.15s;
-  transition: 0.15s;
-}
-
-.side-menu.side-expanded {
-  opacity: 1;
-  width: 50px;
-}
-/*# sourceMappingURL=SideMenu.css.map */
+/*# sourceMappingURL=Menu.css.map */

@@ -1,0 +1,3 @@
+Canvas.js: AlignmentConnections need to be worked on. A proximity variable was added so the mouse coordinates don't have to be exactly the same as the element coordinates in order to trigger the alignment. A useState may need to be added so when someone tries to add an element it goes to the coordinate of the element and not the mouse (which may be slightly different due to the buffer)
+
+Canvas.js: Refactor a lot of the canvas to be more plug-and-play. The element functions can be abstracted to an element class that each individual element extends. The entire canvas.js can be made into a <Canvas /> component to be configured for various applications (ie: canvas for linkage simulation, etc.)

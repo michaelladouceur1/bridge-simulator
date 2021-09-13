@@ -3,13 +3,15 @@ import React, { useState } from "react";
 import "./Button.scss";
 
 export const Button = (props) => {
-  const { tooltip, width = "50px", height = "50px", ...args } = props;
+  const { tooltip, width = "40px", height = "40px", ...args } = props;
 
   const [tooltipVisible, setTooltipVisible] = useState(false);
 
   const buttonStyle = {
     width: width,
     height: height,
+    // fontSize: "18px",
+    // fill: "18px",
   };
 
   const tooltipStyle = {
