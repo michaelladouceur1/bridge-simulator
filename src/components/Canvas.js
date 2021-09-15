@@ -64,8 +64,8 @@ function Support(id, x, y, scale) {
   this.draw = function (ctx) {
     ctx.fillStyle = "#949494";
     ctx.lineWidth = 1;
-    let p1 = new Path2D();
-    p1.rect(0, 0, 0, 0);
+    this.path = new Path2D();
+    this.path.rect(0, 0, 0, 0);
     let p2 = new Path2D(
       "M 12 12 L 6 12 L 3 9 L -3 9 L -6 12 L -12 12 L -6 -3 C -3 -9 3 -9 6 -3 L 12 12 M -3 0 A 3 3 90 0 0 3 0 A 3 3 90 0 0 -3 0"
     );
@@ -76,9 +76,9 @@ function Support(id, x, y, scale) {
     m.d = 1;
     m.e = this.x;
     m.f = this.y;
-    p1.addPath(p2, m);
-    ctx.stroke(p1);
-    ctx.fill(p1);
+    this.path.addPath(p2, m);
+    ctx.stroke(this.path);
+    ctx.fill(this.path);
   };
 }
 
@@ -151,7 +151,7 @@ export const Canvas = () => {
 
     const classesString = classes
       .map((obj) => {
-        return obj.value === true ? obj.classTrue : obj.classFalse;
+        return obj.value || obj.value === true ? obj.classTrue : obj.classFalse;
       })
       .join(" ");
 
@@ -243,14 +243,17 @@ export const Canvas = () => {
     // Check if the mouse is hovering over the same position as a connection element
     const handleElementHover = () => {
       // Initialize hovered function for checking if the mouse is hovered over a connection element
+      let element = undefined;
       const hovered = (el) => {
         if (ctx.isPointInPath(el.path, mouse.original.x, mouse.original.y)) {
+          element = el;
           return true;
         }
       };
+      connections.some(hovered);
 
       // Set elementHover to result of Array.some(hovered) check
-      setElementHover(connections.some(hovered));
+      setElementHover(element);
     };
 
     // Check if the mouse coords align with any of the connection elements coords
