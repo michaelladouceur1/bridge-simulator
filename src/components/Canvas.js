@@ -18,7 +18,7 @@ function Connection(id, x, y, scale) {
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, Math.PI * 2, false);
     ctx.fillStyle = "#141414";
-    ctx.strokeStyle = "#b8b8b8";
+    ctx.strokeStyle = "#949494";
     ctx.lineWidth = this.radius / 2;
     ctx.fill();
     ctx.stroke();
@@ -46,7 +46,7 @@ function Support(id, x, y, scale) {
   this.y = y / scale;
 
   this.draw = function (ctx) {
-    ctx.fillStyle = "#b8b8b8";
+    ctx.fillStyle = "#949494";
     ctx.lineWidth = 1;
     let p1 = new Path2D();
     p1.rect(0, 0, 0, 0);
