@@ -3,18 +3,21 @@ import { BiRadioCircle } from "react-icons/bi";
 import { GiSpawnNode } from "react-icons/gi";
 import { AiOutlineLine } from "react-icons/ai";
 import { FaTrashAlt } from "react-icons/fa";
-import { BsArrowBarDown, BsArrowBarRight } from "react-icons/bs";
+import { BsArrowBarDown, BsArrowBarRight, BsSun, BsMoon } from "react-icons/bs";
 import { VscRunAll } from "react-icons/vsc";
 
 import { ElementsContext } from "../../contexts/ElementsContext";
+import { ThemeContext } from "../../contexts/ThemeContext";
 
 import { Button } from "../Button";
 
-import "./DefaultMenu.scss";
+import "./BridgeMenu.scss";
 
-export const DefaultMenu = (props) => {
+export const BridgeMenu = (props) => {
   const { setElementType, setConnections, setBeams, setSupports } =
     useContext(ElementsContext);
+
+  const { isLight, setIsLight } = useContext(ThemeContext);
 
   const [activeButton, setActiveButton] = useState("connection");
 
@@ -70,6 +73,12 @@ export const DefaultMenu = (props) => {
           }}
         >
           <BsArrowBarRight />
+        </Button>
+        <Button
+          tooltip={isLight ? "Light Mode" : "Dark Mode"}
+          onClick={() => setIsLight(!isLight)}
+        >
+          {isLight ? <BsSun /> : <BsMoon />}
         </Button>
       </div>
       <div className="edit">

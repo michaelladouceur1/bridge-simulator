@@ -1,3 +1,5 @@
+@import "../App.scss";
+
 button {
   position: relative;
   margin: auto;
@@ -5,33 +7,75 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #141414;
-  color: #b8b8b8;
   border: none;
   border-radius: 5px;
   font-size: 1rem;
 
   &:hover {
-    color: #1f1f1f;
+    // color: #1f1f1f !important;
     cursor: pointer;
 
-    svg {
-      fill: #1f1f1f;
-    }
+    // svg {
+    //   fill: #1f1f1f !important;
+    // }
   }
 
   &.active {
-    background: lightblue;
     transition: opacity 0.3s;
+  }
+
+  &.dark {
+    background: $dark-button-color;
+    color: $dark-text-color;
+
+    &:hover {
+      background: $light-background-color !important;
+
+      svg {
+        fill: $dark-background-color !important;
+      }
+    }
+
+    &.active {
+      background: $dark-highlight-color-1 !important;
+
+      svg {
+        fill: $light-highlight-color-1 !important;
+      }
+    }
 
     svg {
-      fill: #1f1f1f;
+      fill: $dark-text-color;
+    }
+  }
+
+  &.light {
+    background: $light-button-color;
+    color: $light-text-color;
+
+    &:hover {
+      background: $dark-background-color !important;
+
+      svg {
+        fill: $light-background-color !important;
+      }
+    }
+
+    &.active {
+      background: $light-highlight-color-1 !important;
+
+      svg {
+        fill: $dark-highlight-color-1 !important;
+      }
+    }
+
+    svg {
+      fill: $light-text-color;
     }
   }
 
   svg {
     font-size: 1.5rem;
-    fill: #b8b8b8;
   }
 
   .tooltip {

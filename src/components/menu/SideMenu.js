@@ -8,9 +8,7 @@ import { Button } from "../Button";
 import "./SideMenu.scss";
 
 export const SideMenu = (props) => {
-  const { sideMenuExpanded } = props;
-
-  const [activeButton, setActiveButton] = useState("bridge");
+  const { sideMenuExpanded, selectedSubMenu, setSelectedSubMenu } = props;
 
   return (
     <div
@@ -18,32 +16,27 @@ export const SideMenu = (props) => {
         sideMenuExpanded ? "side-expanded" : "side-collapsed"
       }`}
     >
-      {/* <button>1</button>
-      <button>2</button>
-      <button>3</button>
-      <button>4</button>
-      <button>5</button> */}
       <Button
-        className={activeButton === "bridge" ? "active" : ""}
+        className={selectedSubMenu === "bridge" ? "active" : ""}
         tooltip="Bridge Simulator"
         height="35px"
-        onClick={() => setActiveButton("bridge")}
+        onClick={() => setSelectedSubMenu("bridge")}
       >
         <GiArchBridge />
       </Button>
       <Button
-        className={activeButton === "account" ? "active" : ""}
+        className={selectedSubMenu === "account" ? "active" : ""}
         tooltip="Account"
         height="35px"
-        onClick={() => setActiveButton("account")}
+        onClick={() => setSelectedSubMenu("account")}
       >
         <MdAccountBox />
       </Button>
       <Button
-        className={activeButton === "settings" ? "active" : ""}
+        className={selectedSubMenu === "settings" ? "active" : ""}
         tooltip="Settings"
         height="35px"
-        onClick={() => setActiveButton("settings")}
+        onClick={() => setSelectedSubMenu("settings")}
       >
         <MdSettings />
       </Button>

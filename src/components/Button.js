@@ -1,17 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+
+import { ThemeContext } from "../contexts/ThemeContext";
 
 import "./Button.scss";
 
 export const Button = (props) => {
-  const { tooltip, width = "40px", height = "40px", ...args } = props;
+  const {
+    className,
+    tooltip,
+    width = "40px",
+    height = "40px",
+    ...args
+  } = props;
+
+  const { isLight } = useContext(ThemeContext);
 
   const [tooltipVisible, setTooltipVisible] = useState(false);
 
   const buttonStyle = {
     width: width,
     height: height,
-    // fontSize: "18px",
-    // fill: "18px",
   };
 
   const tooltipStyle = {
@@ -21,6 +29,7 @@ export const Button = (props) => {
 
   return (
     <button
+      className={`${className} ${isLight ? "dark" : "light"}`}
       onMouseOver={() => setTooltipVisible(true)}
       onMouseLeave={() => setTooltipVisible(false)}
       style={buttonStyle}

@@ -1,3 +1,5 @@
+@import "../../App.scss";
+
 // Variables
 $transition-speed: 0.15s;
 $padding: 10px;
@@ -13,11 +15,21 @@ $arrow-sizes: 1.25rem;
   width: $main-menu-width;
   left: 10px;
   top: 10px;
-  background: #1f1f1f;
+  background: $dark-menu-color;
   box-shadow: 0 0 3px black;
   border-radius: 5px;
   color: #b8b8b8;
   transition: $transition-speed;
+
+  &.dark {
+    background: $dark-menu-color;
+    color: $dark-text-color;
+  }
+
+  &.light {
+    background: $light-menu-color;
+    color: $light-text-color;
+  }
 
   &.side-expanded {
     width: calc(#{$main-menu-width} + #{$side-menu-width});
@@ -50,8 +62,6 @@ $arrow-sizes: 1.25rem;
       background: transparent;
       height: 100%;
       width: 100%;
-      border-bottom: 1px solid #141414;
-      border-right: 1px solid #141414;
 
       button {
         margin: auto;

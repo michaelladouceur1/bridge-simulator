@@ -1,7 +1,8 @@
 import React, { useState, useLayoutEffect, useContext, useEffect } from "react";
 import { ElementsContext } from "../contexts/ElementsContext";
+import { ThemeContext } from "../contexts/ThemeContext";
 
-import "./Canvas.css";
+import "./Canvas.scss";
 
 // Parameters
 const radius = 5;
@@ -108,10 +109,36 @@ export const Canvas = () => {
     setSupports,
   } = useContext(ElementsContext);
 
+  const { isLight } = useContext(ThemeContext);
+
   const [mouseDown, setMouseDown] = useState(false);
+  const [cssClasses, setCssClasses] = useState("");
   const [mouse, setMouse] = useState({ x: undefined, y: undefined });
   const [alignments, setAlignments] = useState([]);
   const [elementHover, setElementHover] = useState(false);
+
+  useEffect(() => {
+    const classes = [
+      {
+        value: elementHover,
+        classTrue: "hovered",
+        classFalse: "",
+      },
+      {
+        value: isLight,
+        classTrue: "dark",
+        classFalse: "light",
+      },
+    ];
+
+    const classesString = classes
+      .map((obj) => {
+        return obj.value === true ? obj.classTrue : obj.classFalse;
+      })
+      .join(" ");
+
+    setCssClasses(classesString);
+  }, [elementHover, isLight]);
 
   useLayoutEffect(() => {
     drawElements();
@@ -334,7 +361,7 @@ export const Canvas = () => {
 
   return (
     <canvas
-      className={elementHover ? "hovered" : ""}
+      className={cssClasses}
       width={window.innerWidth}
       height={window.innerHeight}
       onMouseDown={handleMouseDown}

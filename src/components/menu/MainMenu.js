@@ -1,11 +1,17 @@
 import React from "react";
 
-import { DefaultMenu } from "./DefaultMenu";
+import { BridgeMenu } from "./BridgeMenu";
+import { AccountMenu } from "./AccountMenu";
+import { SettingsMenu } from "./SettingsMenu";
 
 export const MainMenu = (props) => {
-  return (
-    <div className="main-menu">
-      <DefaultMenu />
-    </div>
-  );
+  const { selectedSubMenu } = props;
+
+  const menus = {
+    bridge: <BridgeMenu />,
+    account: <AccountMenu />,
+    settings: <SettingsMenu />,
+  };
+
+  return <div className="main-menu">{menus[selectedSubMenu]}</div>;
 };
