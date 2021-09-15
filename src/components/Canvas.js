@@ -5,7 +5,7 @@ import { ThemeContext } from "../contexts/ThemeContext";
 import "./Canvas.scss";
 
 // Parameters
-const radius = 5;
+const radius = 6;
 
 // Connection element
 function Connection(id, x, y, scale) {
@@ -15,13 +15,14 @@ function Connection(id, x, y, scale) {
   this.radius = radius;
 
   this.draw = function (ctx) {
+    this.path = new Path2D();
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, Math.PI * 2, false);
+    this.path.arc(this.x, this.y, this.radius, Math.PI * 2, false);
     ctx.fillStyle = "#141414";
     ctx.strokeStyle = "#949494";
-    ctx.lineWidth = this.radius / 2;
-    ctx.fill();
-    ctx.stroke();
+    ctx.lineWidth = this.radius / 3;
+    ctx.fill(this.path);
+    ctx.stroke(this.path);
     ctx.closePath();
   };
 
@@ -36,6 +37,21 @@ function Connection(id, x, y, scale) {
   this.translate = function (xTranslate, yTranslate) {
     this.displayX += xTranslate;
     this.displayY += yTranslate;
+  };
+}
+
+function Beam(id, el1, el2, scale) {
+  this.id = id;
+  this.el1 = el1;
+  this.el2 = el2;
+
+  this.draw = function (ctx) {
+    ctx.fillStyle = "#949494";
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(el1.x, el1.y);
+    ctx.lineTo(el2.x, el2.y);
+    ctx.closePath();
   };
 }
 
@@ -77,18 +93,20 @@ function Alignment(element, mouse, prox) {
 
     ctx.beginPath();
     if (
-      this.mouse.x > this.element.x - prox &&
-      this.mouse.x < this.element.x + prox
+      this.mouse.transformed.x > this.element.x - prox &&
+      this.mouse.transformed.x < this.element.x + prox
     ) {
-      yOffset = this.element.y > this.mouse.y ? -(radius * 2) : radius * 2;
+      yOffset =
+        this.element.y > this.mouse.transformed.y ? -(radius * 2) : radius * 2;
     } else {
-      xOffset = this.element.x > this.mouse.x ? -(radius * 2) : radius * 2;
+      xOffset =
+        this.element.x > this.mouse.transformed.x ? -(radius * 2) : radius * 2;
     }
     ctx.moveTo(this.element.x + xOffset, this.element.y + yOffset);
     if (yOffset === 0) {
-      ctx.lineTo(this.mouse.x, this.element.y);
+      ctx.lineTo(this.mouse.transformed.x, this.element.y);
     } else {
-      ctx.lineTo(this.element.x, this.mouse.y);
+      ctx.lineTo(this.element.x, this.mouse.transformed.y);
     }
     ctx.lineWidth = 0.5;
     ctx.stroke();
@@ -148,6 +166,7 @@ export const Canvas = () => {
     // Set canvas and context; Clear canvas for new render
     const canvas = document.querySelector("canvas");
     const ctx = canvas.getContext("2d");
+    // console.log(ctx);
     // console.log(ctx.getTransform());
     // console.log(connections);
     ctx.clearRect(0, 0, innerWidth, innerHeight);
@@ -193,29 +212,41 @@ export const Canvas = () => {
     setMouseDown(false);
   };
 
+  let count = 0;
+
   const handleMouseMove = (event) => {
     // Set mouse object coordinates
     const canvas = document.querySelector("canvas");
     const ctx = canvas.getContext("2d");
 
     const { clientX, clientY } = event;
-    const { e: xOffset, f: yOffset } = ctx.getTransform();
+    const { a, e: xOffset, f: yOffset } = ctx.getTransform();
 
     setMouse({
-      x: clientX - xOffset,
-      y: clientY - yOffset,
+      transformed: {
+        x: clientX - xOffset,
+        y: clientY - yOffset,
+      },
+      original: {
+        x: clientX,
+        y: clientY,
+      },
     });
-    // console.log(mouse);
+
+    // if (count % 100 === 0) {
+    //   console.log(mouse);
+    //   console.log(connections);
+    //   console.log("\n\n\n");
+    // }
+    // count++;
 
     // Check if the mouse is hovering over the same position as a connection element
     const handleElementHover = () => {
       // Initialize hovered function for checking if the mouse is hovered over a connection element
       const hovered = (el) => {
-        const hoveredRadius = Math.sqrt(
-          Math.pow(el.x - mouse.x, 2) + Math.pow(el.y - mouse.y, 2)
-        );
-
-        return hoveredRadius < radius;
+        if (ctx.isPointInPath(el.path, mouse.original.x, mouse.original.y)) {
+          return true;
+        }
       };
 
       // Set elementHover to result of Array.some(hovered) check
@@ -236,14 +267,16 @@ export const Canvas = () => {
 
         // Check if vertical alignment band is valid
         if (
-          (mouse.x > element.x - prox && mouse.x < element.x + prox) ||
-          (mouse.y > element.y - prox && mouse.y < element.y + prox)
+          (mouse.transformed.x > element.x - prox &&
+            mouse.transformed.x < element.x + prox) ||
+          (mouse.transformed.y > element.y - prox &&
+            mouse.transformed.y < element.y + prox)
         ) {
-          console.log(alignments);
+          // console.log(alignments);
           if (!alignmentConnection) {
-            console.log("alignment not found");
+            // console.log("alignment not found");
             setAlignments([...alignments, new Alignment(element, mouse, prox)]);
-          } else if (alignmentConnection.element.y !== mouse.y) {
+          } else if (alignmentConnection.element.y !== mouse.transformed.y) {
             const alignmentsCopy = [...alignments];
             const index = alignmentsCopy.find((al, idx) => {
               if (al.element.id === element.id) return idx;
@@ -259,10 +292,10 @@ export const Canvas = () => {
 
         // todo: horizontal and vertical check can be implemented in the same logic, but some issues still exist
         // Check if horizontal alignment band is valid
-        // else if (mouse.y > element.y - prox && mouse.y < element.y + prox) {
+        // else if (mouse.transformed.y > element.y - prox && mouse.transformed.y < element.y + prox) {
         //   if (!alignmentConnection) {
         //     setAlignments([...alignments, new Alignment(element, mouse, prox)]);
-        //   } else if (alignmentConnection.element.x !== mouse.x) {
+        //   } else if (alignmentConnection.element.x !== mouse.transformed.x) {
         //     const alignmentsCopy = [...alignments];
         //     const index = alignmentsCopy.find((al, idx) => {
         //       if (al.element.id === element.id) return idx;
@@ -301,10 +334,10 @@ export const Canvas = () => {
     // Bug where the elements are being drawn multiple times on zoom
     // const border = 10;
     // if (
-    //   mouse.x < border ||
-    //   mouse.y < border ||
-    //   mouse.x > window.innerWidth - border ||
-    //   mouse.y > window.innerHeight - border
+    //   mouse.transformed.x < border ||
+    //   mouse.transformed.y < border ||
+    //   mouse.transformed.x > window.innerWidth - border ||
+    //   mouse.transformed.y > window.innerHeight - border
     // ) {
     //   return;
     // }
@@ -319,16 +352,23 @@ export const Canvas = () => {
       const connectionId = `${connections.length + 1}C`;
       setConnections([
         ...connections,
-        new Connection(connectionId, mouse.x, mouse.y, scale),
+        new Connection(
+          connectionId,
+          mouse.transformed.x,
+          mouse.transformed.y,
+          scale
+        ),
       ]);
     };
+
+    const handleBeamClick = () => {};
 
     // Create new Support element
     const handleSupportClick = () => {
       const supportId = `${supports.length + 1}S`;
       setSupports([
         ...supports,
-        new Support(supportId, mouse.x, mouse.y, scale),
+        new Support(supportId, mouse.transformed.x, mouse.transformed.y, scale),
       ]);
     };
 
@@ -343,20 +383,22 @@ export const Canvas = () => {
     const { a } = ctx.getTransform();
 
     if (event.deltaY < 0 && a < 2) {
-      ctx.translate(mouse.x, mouse.y);
+      ctx.translate(mouse.transformed.x, mouse.transformed.y);
       ctx.scale(1 + scaleFactor, 1 + scaleFactor);
-      ctx.translate(-mouse.x, -mouse.y);
+      ctx.translate(-mouse.transformed.x, -mouse.transformed.y);
     } else if (event.deltaY > 0 && a > 0.5) {
-      ctx.translate(mouse.x, mouse.y);
+      ctx.translate(mouse.transformed.x, mouse.transformed.y);
       ctx.scale(1 - scaleFactor, 1 - scaleFactor);
-      ctx.translate(-mouse.x, -mouse.y);
+      ctx.translate(-mouse.transformed.x, -mouse.transformed.y);
     }
 
     drawElements();
   };
 
   const handleAuxClick = (event) => {
-    console.log("handleAuxClick");
+    console.log(mouse);
+    console.log(connections);
+    console.log("\n\n\n");
   };
 
   return (
@@ -368,7 +410,7 @@ export const Canvas = () => {
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
       onClick={handleClick}
-      onWheel={handleWheel}
+      // onWheel={handleWheel}
       onAuxClick={handleAuxClick}
     />
   );
