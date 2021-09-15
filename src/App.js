@@ -5,7 +5,7 @@ import { ElementsContextProvider } from "./contexts/ElementsContext";
 
 import { Canvas } from "./components/Canvas";
 import { Menu } from "./components/menu/Menu";
-import "./App.css";
+import "./App.scss";
 
 export const App = () => {
   return (

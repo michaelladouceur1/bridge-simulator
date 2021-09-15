@@ -1,0 +1,26 @@
+// Dark Mode Variables
+$dark-background-color: #141414;
+$dark-menu-color: #1f1f1f;
+$dark-text-color: #b8b8b8;
+$dark-button-color: #343434;
+$dark-highlight-color-1: #949494;
+
+// Light Mode Variables
+$light-background-color: #e6e6e6;
+$light-menu-color: #bfbfbf;
+$light-button-color: #717171;
+$light-text-color: #141414;
+$light-highlight-color-1: #414141;
+
+* {
+  font-size: 18px;
+}
+
+body,
+html,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
