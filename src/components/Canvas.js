@@ -10,6 +10,7 @@ const radius = 6;
 // Connection element
 function Connection(id, x, y, scale) {
   this.id = id;
+  this.type = "connection";
   this.x = x / scale;
   this.y = y / scale;
   this.radius = radius;
@@ -40,17 +41,22 @@ function Connection(id, x, y, scale) {
   };
 }
 
-function Beam(id, el1, el2, scale) {
+function Beam(id, el1, el2) {
+  console.log("BEAM CREATED");
+  console.log(el1);
+  console.log(el2);
   this.id = id;
+  this.type = "beam";
   this.el1 = el1;
   this.el2 = el2;
 
   this.draw = function (ctx) {
-    ctx.fillStyle = "#949494";
+    ctx.fillStyle = "white";
     ctx.lineWidth = 5;
     ctx.beginPath();
     ctx.moveTo(el1.x, el1.y);
     ctx.lineTo(el2.x, el2.y);
+    ctx.stroke();
     ctx.closePath();
   };
 }
@@ -58,6 +64,7 @@ function Beam(id, el1, el2, scale) {
 // Support element
 function Support(id, x, y, scale) {
   this.id = id;
+  this.type = "support";
   this.x = x / scale;
   this.y = y / scale;
 
@@ -130,8 +137,10 @@ export const Canvas = () => {
   const { isLight } = useContext(ThemeContext);
 
   const [mouseDown, setMouseDown] = useState(false);
+  const [pendingElement, setPendingElement] = useState(undefined);
   const [cssClasses, setCssClasses] = useState("");
   const [mouse, setMouse] = useState({ x: undefined, y: undefined });
+  // The following should be used: alignments = {x: undefined, y: undefined}
   const [alignments, setAlignments] = useState([]);
   const [elementHover, setElementHover] = useState(false);
 
@@ -159,56 +168,25 @@ export const Canvas = () => {
   }, [elementHover, isLight]);
 
   useLayoutEffect(() => {
-    drawElements();
-  }, [connections, beams, supports, alignments]);
+    // Combine all rendered elements
+    const elements = [...alignments, ...connections, ...beams, ...supports];
 
-  const drawElements = () => {
     // Set canvas and context; Clear canvas for new render
     const canvas = document.querySelector("canvas");
     const ctx = canvas.getContext("2d");
-    // console.log(ctx);
-    // console.log(ctx.getTransform());
-    // console.log(connections);
     ctx.clearRect(0, 0, innerWidth, innerHeight);
 
-    // Draw connections
-    if (connections.length > 0) {
-      for (const connection of connections) {
-        connection.draw(ctx);
-      }
+    // Render elements
+    for (const el of elements) {
+      el.draw(ctx);
     }
-
-    // Draw beams
-    if (beams.length > 0) {
-      for (const beam of beams) {
-        beam.draw(ctx);
-      }
-    }
-
-    // Draw Supports
-    if (supports.length > 0) {
-      for (const support of supports) {
-        support.draw(ctx);
-      }
-    }
-
-    // Draw alignments
-    if (alignments.length > 0) {
-      for (const alignment of alignments) {
-        alignment.draw(ctx);
-      }
-    }
-  };
+  }, [connections, beams, supports, alignments]);
 
   const handleMouseDown = (event) => {
-    // console.log(event);
-    // console.log(window);
-    // console.log("handleMouseDown");
     setMouseDown(true);
   };
 
   const handleMouseUp = () => {
-    // console.log("handleMouseUp");
     setMouseDown(false);
   };
 
@@ -233,13 +211,6 @@ export const Canvas = () => {
       },
     });
 
-    // if (count % 100 === 0) {
-    //   console.log(mouse);
-    //   console.log(connections);
-    //   console.log("\n\n\n");
-    // }
-    // count++;
-
     // Check if the mouse is hovering over the same position as a connection element
     const handleElementHover = () => {
       // Initialize hovered function for checking if the mouse is hovered over a connection element
@@ -251,6 +222,7 @@ export const Canvas = () => {
         }
       };
       connections.some(hovered);
+      supports.some(hovered);
 
       // Set elementHover to result of Array.some(hovered) check
       setElementHover(element);
@@ -258,6 +230,7 @@ export const Canvas = () => {
 
     // Check if the mouse coords align with any of the connection elements coords
     const handleConnectionAlignment = () => {
+      if (elementType === "beam") return;
       for (const element of [...connections, ...supports]) {
         // Find if checked connection exists in alignments
         const alignmentConnection = alignments.find(
@@ -331,7 +304,8 @@ export const Canvas = () => {
     handleConnectionAlignment();
   };
 
-  const handleClick = () => {
+  const handleClick = (event) => {
+    console.log("BEAMS: ", beams);
     // todo; The border limiting doesn't work when zoomed out currently.
     // Check if the click was too close to the edges
     // Bug where the elements are being drawn multiple times on zoom
@@ -364,7 +338,18 @@ export const Canvas = () => {
       ]);
     };
 
-    const handleBeamClick = () => {};
+    const handleBeamClick = () => {
+      if (elementHover) {
+        const beamId = `${beams.length + 1}B`;
+        if (pendingElement) {
+          if (pendingElement.id === elementHover.id) return;
+          setBeams([...beams, new Beam(beamId, pendingElement, elementHover)]);
+          setPendingElement(undefined);
+        } else {
+          setPendingElement(elementHover);
+        }
+      }
+    };
 
     // Create new Support element
     const handleSupportClick = () => {
@@ -376,7 +361,13 @@ export const Canvas = () => {
     };
 
     if (elementType === "connection") handleConnectionClick();
+    else if (elementType === "beam") handleBeamClick();
     else if (elementType === "support") handleSupportClick();
+  };
+
+  const handleContextMenu = (event) => {
+    console.log(event);
+    // event.preventDefault();
   };
 
   const handleWheel = (event) => {
@@ -401,6 +392,7 @@ export const Canvas = () => {
   const handleAuxClick = (event) => {
     console.log(mouse);
     console.log(connections);
+    console.log(elementHover);
     console.log("\n\n\n");
   };
 
@@ -413,6 +405,7 @@ export const Canvas = () => {
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
       onClick={handleClick}
+      onContextMenu={handleContextMenu}
       // onWheel={handleWheel}
       onAuxClick={handleAuxClick}
     />
