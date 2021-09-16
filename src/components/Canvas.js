@@ -95,6 +95,7 @@ function Alignment(element, mouse, prox) {
   this.mouse = mouse;
 
   this.draw = function (ctx) {
+    console.log("align draw");
     let xOffset = 0;
     let yOffset = 0;
 
@@ -141,7 +142,7 @@ export const Canvas = () => {
   const [cssClasses, setCssClasses] = useState("");
   const [mouse, setMouse] = useState({ x: undefined, y: undefined });
   // The following should be used: alignments = {x: undefined, y: undefined}
-  const [alignments, setAlignments] = useState([]);
+  const [alignments, setAlignments] = useState({ x: undefined, y: undefined });
   const [elementHover, setElementHover] = useState(false);
 
   useEffect(() => {
@@ -169,7 +170,7 @@ export const Canvas = () => {
 
   useLayoutEffect(() => {
     // Combine all rendered elements
-    const elements = [...alignments, ...connections, ...beams, ...supports];
+    const elements = [...connections, ...beams, ...supports];
 
     // Set canvas and context; Clear canvas for new render
     const canvas = document.querySelector("canvas");
@@ -179,6 +180,18 @@ export const Canvas = () => {
     // Render elements
     for (const el of elements) {
       el.draw(ctx);
+    }
+
+    console.log(alignments.x);
+    console.log(alignments.y);
+
+    if (alignments.x) {
+      console.log("draw x: ", alignments.x);
+      alignments.x.draw(ctx);
+    }
+    if (alignments.y) {
+      console.log("draw y: ", alignments.y);
+      alignments.y.draw(ctx);
     }
   }, [connections, beams, supports, alignments]);
 
@@ -211,6 +224,8 @@ export const Canvas = () => {
       },
     });
 
+    // console.log(alignments);
+
     // Check if the mouse is hovering over the same position as a connection element
     const handleElementHover = () => {
       // Initialize hovered function for checking if the mouse is hovered over a connection element
@@ -233,9 +248,9 @@ export const Canvas = () => {
       if (elementType === "beam") return;
       for (const element of [...connections, ...supports]) {
         // Find if checked connection exists in alignments
-        const alignmentConnection = alignments.find(
-          (al) => al.element.id === element.id
-        );
+        // const alignmentConnection = alignments.find(
+        //   (al) => al.element.id === element.id
+        // );
 
         // Connection and mouse coords align
         // Add connection to alignments if it does not already exist in alignments
@@ -243,57 +258,60 @@ export const Canvas = () => {
 
         // Check if vertical alignment band is valid
         if (
-          (mouse.transformed.x > element.x - prox &&
-            mouse.transformed.x < element.x + prox) ||
-          (mouse.transformed.y > element.y - prox &&
-            mouse.transformed.y < element.y + prox)
+          mouse.transformed.x > element.x - prox &&
+          mouse.transformed.x < element.x + prox
         ) {
           // console.log(alignments);
-          if (!alignmentConnection) {
-            // console.log("alignment not found");
-            setAlignments([...alignments, new Alignment(element, mouse, prox)]);
-          } else if (alignmentConnection.element.y !== mouse.transformed.y) {
-            const alignmentsCopy = [...alignments];
-            const index = alignmentsCopy.find((al, idx) => {
-              if (al.element.id === element.id) return idx;
-            });
-            alignmentsCopy.splice(
-              index,
-              1,
-              new Alignment(element, mouse, prox)
-            );
+          if (!alignments.y) {
+            const alignmentsCopy = { ...alignments };
+            alignmentsCopy.y = new Alignment(element, mouse, prox);
             setAlignments(alignmentsCopy);
+            // alignmentsCopy.y.draw(ctx);
+            console.log(alignmentsCopy);
+          } else if (alignments.y.element.id === element.id) {
+            if (alignments.y.element.y !== mouse.transformed.y) {
+              const alignmentsCopy = { ...alignments };
+              alignmentsCopy.y = new Alignment(element, mouse, prox);
+              setAlignments(alignmentsCopy);
+              // alignmentsCopy.y.draw(ctx);
+              console.log(alignmentsCopy);
+            }
           }
         }
 
-        // todo: horizontal and vertical check can be implemented in the same logic, but some issues still exist
         // Check if horizontal alignment band is valid
-        // else if (mouse.transformed.y > element.y - prox && mouse.transformed.y < element.y + prox) {
-        //   if (!alignmentConnection) {
-        //     setAlignments([...alignments, new Alignment(element, mouse, prox)]);
-        //   } else if (alignmentConnection.element.x !== mouse.transformed.x) {
-        //     const alignmentsCopy = [...alignments];
-        //     const index = alignmentsCopy.find((al, idx) => {
-        //       if (al.element.id === element.id) return idx;
-        //     });
-        //     alignmentsCopy.splice(
-        //       index,
-        //       1,
-        //       new Alignment(element, mouse, prox)
-        //     );
-        //     setAlignments(alignmentsCopy);
-        //   }
-        // }
+        else if (
+          mouse.transformed.y > element.y - prox &&
+          mouse.transformed.y < element.y + prox
+        ) {
+          if (!alignments.x) {
+            const alignmentsCopy = { ...alignments };
+            alignmentsCopy.x = new Alignment(element, mouse, prox);
+            setAlignments(alignmentsCopy);
+            // alignmentsCopy.x.draw(ctx);
+            console.log(alignmentsCopy);
+          } else if (alignments.x.element.id === element.id) {
+            if (alignments.x.element.x !== mouse.transformed.x) {
+              const alignmentsCopy = { ...alignments };
+              alignmentsCopy.x = new Alignment(element, mouse, prox);
+              setAlignments(alignmentsCopy);
+              // alignmentsCopy.x.draw(ctx);
+              console.log(alignmentsCopy);
+            }
+          }
+        }
 
         // Connection and mouse coords do not align
         // Remove from alignments if connection exists in alignments
         else {
-          if (alignmentConnection) {
-            const alignmentsCopy = [...alignments];
-            const index = alignmentsCopy.find((al, idx) => {
-              if (al.element.id === element.id) return idx;
-            });
-            alignmentsCopy.splice(index, 1);
+          if (alignments.x && alignments.x.element.id === element.id) {
+            const alignmentsCopy = { ...alignments };
+            alignmentsCopy.x = undefined;
+            setAlignments(alignmentsCopy);
+          }
+          if (alignments.y && alignments.y.element.id === element.id) {
+            const alignmentsCopy = { ...alignments };
+            alignmentsCopy.y = undefined;
             setAlignments(alignmentsCopy);
           }
         }
