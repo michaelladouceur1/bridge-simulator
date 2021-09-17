@@ -224,8 +224,6 @@ export const Canvas = () => {
       },
     });
 
-    // console.log(alignments);
-
     // Check if the mouse is hovering over the same position as a connection element
     const handleElementHover = () => {
       // Initialize hovered function for checking if the mouse is hovered over a connection element
@@ -245,11 +243,9 @@ export const Canvas = () => {
 
     const handleElementMove = () => {
       // console.log("handleElementMove");
-
-      if (!mouseDown || !elementHover) return;
-      elementHover.x = mouse.transformed.x;
-      elementHover.y = mouse.transformed.y;
-
+      // if (!mouseDown || !elementHover) return;
+      // elementHover.x = mouse.transformed.x;
+      // elementHover.y = mouse.transformed.y;
       // if (!pendingElement) {
       //   if (!mouseDown || !elementHover) return;
       //   setPendingElement(elementHover);
@@ -257,7 +253,6 @@ export const Canvas = () => {
       // if (pendingElement && !mouseDown) setPendingElement(undefined);
       // pendingElement.x = mouse.transformed.x;
       // pendingElement.y = mouse.transformed.y;
-
       // console.log(connections);
       // if (mouseDown && elementHover && !pendingElement) {
       //   setPendingElement(elementHover);
@@ -274,65 +269,77 @@ export const Canvas = () => {
       if (elementType === "beam") return;
 
       const prox = 15;
+      const elements = [...connections, ...supports];
+      const alignmentsCopy = { ...alignments };
 
-      const checkProximityBand = (coord, element) => {
+      const checkAlignmentBand = (coord, element) => {
         return (
           mouse.transformed[coord] > element[coord] - prox &&
           mouse.transformed[coord] < element[coord] + prox
         );
       };
 
-      for (const element of [...connections, ...supports]) {
+      const checkProximity = (coord, element) => {
+        return (
+          Math.abs(mouse.transformed[coord] - element[coord]) <
+          Math.abs(
+            mouse.transformed[coord] - alignmentsCopy[coord].element[coord]
+          )
+        );
+      };
+
+      // Check if alignments.x and alignments.y contain the same element
+      // If so, setAlignments to undefined
+      if (alignmentsCopy.x && alignmentsCopy.y) {
+        if (alignmentsCopy.x.element.id === alignmentsCopy.y.element.id) {
+          setAlignments({ x: undefined, y: undefined });
+          return;
+        }
+      }
+
+      for (const element of elements) {
         // Check if vertical alignment band is valid
-        if (checkProximityBand("x", element)) {
-          // console.log(alignments);
-          if (!alignments.y) {
-            const alignmentsCopy = { ...alignments };
+        if (checkAlignmentBand("x", element)) {
+          // Check if alignmentsCopy.y element does not exists
+          // Check if alignmentsCopy.y element id is equal to current checked element id
+          // Check if alignmentsCopy.y element exists and see if it is closer to the mouse than the current checked element
+          // If so, assign a new alignment to alignmentsCopy.y
+          if (
+            !alignmentsCopy.y ||
+            alignmentsCopy.y.element.id === element.id ||
+            (alignmentsCopy.y && checkProximity("y", element))
+          ) {
             alignmentsCopy.y = new Alignment(element, mouse, prox);
-            setAlignments(alignmentsCopy);
-            // console.log(alignmentsCopy);
-          } else if (alignments.y.element.id === element.id) {
-            if (alignments.y.element.y !== mouse.transformed.y) {
-              const alignmentsCopy = { ...alignments };
-              alignmentsCopy.y = new Alignment(element, mouse, prox);
-              setAlignments(alignmentsCopy);
-              // console.log(alignmentsCopy);
-            }
           }
         }
 
         // Check if horizontal alignment band is valid
-        else if (checkProximityBand("y", element)) {
-          if (!alignments.x) {
-            const alignmentsCopy = { ...alignments };
+        else if (checkAlignmentBand("y", element)) {
+          // Check if alignmentsCopy.x element does not exists
+          // Check if alignmentsCopy.x element id is equal to current checked element id
+          // Check if alignmentsCopy.x element exists and see if it is closer to the mouse than the current checked element
+          // If so, assign a new alignment to alignmentsCopy.x
+          if (
+            !alignmentsCopy.x ||
+            alignmentsCopy.x.element.id === element.id ||
+            (alignmentsCopy.x && checkProximity("x", element))
+          ) {
             alignmentsCopy.x = new Alignment(element, mouse, prox);
-            setAlignments(alignmentsCopy);
-            // console.log(alignmentsCopy);
-          } else if (alignments.x.element.id === element.id) {
-            if (alignments.x.element.x !== mouse.transformed.x) {
-              const alignmentsCopy = { ...alignments };
-              alignmentsCopy.x = new Alignment(element, mouse, prox);
-              setAlignments(alignmentsCopy);
-              // console.log(alignmentsCopy);
-            }
           }
         }
 
         // Connection and mouse coords do not align
         // Remove from alignments if connection exists in alignments
         else {
-          if (alignments.x && alignments.x.element.id === element.id) {
-            const alignmentsCopy = { ...alignments };
+          if (alignmentsCopy.x && alignmentsCopy.x.element.id === element.id) {
             alignmentsCopy.x = undefined;
-            setAlignments(alignmentsCopy);
           }
-          if (alignments.y && alignments.y.element.id === element.id) {
-            const alignmentsCopy = { ...alignments };
+          if (alignmentsCopy.y && alignmentsCopy.y.element.id === element.id) {
             alignmentsCopy.y = undefined;
-            setAlignments(alignmentsCopy);
           }
         }
       }
+      setAlignments(alignmentsCopy);
     };
 
     handleElementHover();
@@ -341,7 +348,8 @@ export const Canvas = () => {
   };
 
   const handleClick = (event) => {
-    console.log("BEAMS: ", beams);
+    if (contextMenu.visible) return;
+    // console.log("BEAMS: ", beams);
     // todo; The border limiting doesn't work when zoomed out currently.
     // Check if the click was too close to the edges
     // Bug where the elements are being drawn multiple times on zoom
@@ -354,6 +362,7 @@ export const Canvas = () => {
     // ) {
     //   return;
     // }
+    setAlignments({ x: undefined, y: undefined });
 
     let placementX = mouse.transformed.x;
     let placementY = mouse.transformed.y;
