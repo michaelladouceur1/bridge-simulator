@@ -35,12 +35,16 @@ export const Button = (props) => {
       style={buttonStyle}
       {...args}
     >
-      <div
-        className={`tooltip ${tooltipVisible ? "visible" : "hidden"}`}
-        style={tooltipStyle}
-      >
-        {tooltip}
-      </div>
+      {tooltip ? (
+        <div
+          className={`tooltip ${tooltipVisible ? "visible" : "hidden"}`}
+          style={tooltipStyle}
+        >
+          {tooltip}
+        </div>
+      ) : (
+        <></>
+      )}
       {props.children}
     </button>
   );

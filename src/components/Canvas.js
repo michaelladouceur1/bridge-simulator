@@ -51,12 +51,17 @@ function Beam(id, el1, el2) {
   this.el2 = el2;
 
   this.draw = function (ctx) {
-    ctx.fillStyle = "white";
-    ctx.lineWidth = 5;
+    console.log(ctx);
     ctx.beginPath();
+    ctx.setLineDash([2, 2]);
+    ctx.lineWidth = 3;
+    ctx.globalCompositeOperation = "destination-over";
+    ctx.strokeStyle = "white";
     ctx.moveTo(el1.x, el1.y);
     ctx.lineTo(el2.x, el2.y);
     ctx.stroke();
+    ctx.globalCompositeOperation = "source-over";
+    ctx.setLineDash([]);
     ctx.closePath();
   };
 }
@@ -136,13 +141,12 @@ export const Canvas = () => {
 
   const { isLight } = useContext(ThemeContext);
 
+  const [alignments, setAlignments] = useState({ x: undefined, y: undefined });
+  const [cssClasses, setCssClasses] = useState("");
+  const [elementHover, setElementHover] = useState(false);
+  const [mouse, setMouse] = useState({ x: undefined, y: undefined });
   const [mouseDown, setMouseDown] = useState(false);
   const [pendingElement, setPendingElement] = useState(undefined);
-  const [cssClasses, setCssClasses] = useState("");
-  const [mouse, setMouse] = useState({ x: undefined, y: undefined });
-  // The following should be used: alignments = {x: undefined, y: undefined}
-  const [alignments, setAlignments] = useState({ x: undefined, y: undefined });
-  const [elementHover, setElementHover] = useState(false);
 
   useEffect(() => {
     const classes = [
@@ -181,9 +185,9 @@ export const Canvas = () => {
       el.draw(ctx);
     }
 
-    console.log(alignments.x);
-    console.log(alignments.y);
-    console.log("\n\n");
+    // console.log(alignments.x);
+    // console.log(alignments.y);
+    // console.log("\n\n");
 
     if (alignments.x) {
       alignments.x.draw(ctx);
@@ -239,6 +243,32 @@ export const Canvas = () => {
 
       // Set elementHover to result of Array.some(hovered) check
       setElementHover(element);
+    };
+
+    const handleElementMove = () => {
+      // console.log("handleElementMove");
+
+      if (!mouseDown || !elementHover) return;
+      elementHover.x = mouse.transformed.x;
+      elementHover.y = mouse.transformed.y;
+
+      // if (!pendingElement) {
+      //   if (!mouseDown || !elementHover) return;
+      //   setPendingElement(elementHover);
+      // }
+      // if (pendingElement && !mouseDown) setPendingElement(undefined);
+      // pendingElement.x = mouse.transformed.x;
+      // pendingElement.y = mouse.transformed.y;
+
+      // console.log(connections);
+      // if (mouseDown && elementHover && !pendingElement) {
+      //   setPendingElement(elementHover);
+      // } else if (mouseDown && pendingElement) {
+      //   pendingElement.x = mouse.transformed.x;
+      //   pendingElement.y = mouse.transformed.y;
+      // } else {
+      //   setPendingElement(undefined);
+      // }
     };
 
     // Check if the mouse coords align with any of the connection elements coords
@@ -308,6 +338,7 @@ export const Canvas = () => {
     };
 
     handleElementHover();
+    // handleElementMove();
     handleConnectionAlignment();
   };
 

@@ -106,7 +106,7 @@ button {
     opacity: 1;
     transition: opacity 0.1s;
     transition-delay: 1.5s;
-    z-index: 1;
+    z-index: 100;
   }
 
   .hidden {

@@ -1,0 +1,44 @@
+@import "../../App.scss";
+
+.context-menu-container {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  left: 50%;
+  top: 50%;
+  background: transparent;
+}
+
+.context-menu {
+  z-index: 1;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: transparent;
+
+  button {
+    z-index: 1;
+    border-radius: 50%;
+  }
+
+  .outer-button-container {
+    z-index: 0;
+    position: absolute;
+    transform-origin: bottom center;
+    bottom: 50px;
+    background: transparent;
+    height: 80px;
+  }
+
+  .outer-button {
+    button {
+      width: 40px;
+      height: 40px;
+      font-size: 1rem;
+    }
+  }
+}
