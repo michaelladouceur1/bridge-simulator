@@ -95,7 +95,6 @@ function Alignment(element, mouse, prox) {
   this.mouse = mouse;
 
   this.draw = function (ctx) {
-    console.log("align draw");
     let xOffset = 0;
     let yOffset = 0;
 
@@ -184,13 +183,12 @@ export const Canvas = () => {
 
     console.log(alignments.x);
     console.log(alignments.y);
+    console.log("\n\n");
 
     if (alignments.x) {
-      console.log("draw x: ", alignments.x);
       alignments.x.draw(ctx);
     }
     if (alignments.y) {
-      console.log("draw y: ", alignments.y);
       alignments.y.draw(ctx);
     }
   }, [connections, beams, supports, alignments]);
@@ -246,57 +244,48 @@ export const Canvas = () => {
     // Check if the mouse coords align with any of the connection elements coords
     const handleConnectionAlignment = () => {
       if (elementType === "beam") return;
+
+      const prox = 15;
+
+      const checkProximityBand = (coord, element) => {
+        return (
+          mouse.transformed[coord] > element[coord] - prox &&
+          mouse.transformed[coord] < element[coord] + prox
+        );
+      };
+
       for (const element of [...connections, ...supports]) {
-        // Find if checked connection exists in alignments
-        // const alignmentConnection = alignments.find(
-        //   (al) => al.element.id === element.id
-        // );
-
-        // Connection and mouse coords align
-        // Add connection to alignments if it does not already exist in alignments
-        const prox = 10;
-
         // Check if vertical alignment band is valid
-        if (
-          mouse.transformed.x > element.x - prox &&
-          mouse.transformed.x < element.x + prox
-        ) {
+        if (checkProximityBand("x", element)) {
           // console.log(alignments);
           if (!alignments.y) {
             const alignmentsCopy = { ...alignments };
             alignmentsCopy.y = new Alignment(element, mouse, prox);
             setAlignments(alignmentsCopy);
-            // alignmentsCopy.y.draw(ctx);
-            console.log(alignmentsCopy);
+            // console.log(alignmentsCopy);
           } else if (alignments.y.element.id === element.id) {
             if (alignments.y.element.y !== mouse.transformed.y) {
               const alignmentsCopy = { ...alignments };
               alignmentsCopy.y = new Alignment(element, mouse, prox);
               setAlignments(alignmentsCopy);
-              // alignmentsCopy.y.draw(ctx);
-              console.log(alignmentsCopy);
+              // console.log(alignmentsCopy);
             }
           }
         }
 
         // Check if horizontal alignment band is valid
-        else if (
-          mouse.transformed.y > element.y - prox &&
-          mouse.transformed.y < element.y + prox
-        ) {
+        else if (checkProximityBand("y", element)) {
           if (!alignments.x) {
             const alignmentsCopy = { ...alignments };
             alignmentsCopy.x = new Alignment(element, mouse, prox);
             setAlignments(alignmentsCopy);
-            // alignmentsCopy.x.draw(ctx);
-            console.log(alignmentsCopy);
+            // console.log(alignmentsCopy);
           } else if (alignments.x.element.id === element.id) {
             if (alignments.x.element.x !== mouse.transformed.x) {
               const alignmentsCopy = { ...alignments };
               alignmentsCopy.x = new Alignment(element, mouse, prox);
               setAlignments(alignmentsCopy);
-              // alignmentsCopy.x.draw(ctx);
-              console.log(alignmentsCopy);
+              // console.log(alignmentsCopy);
             }
           }
         }
@@ -337,6 +326,15 @@ export const Canvas = () => {
     //   return;
     // }
 
+    let placementX = mouse.transformed.x;
+    let placementY = mouse.transformed.y;
+    if (alignments.x) {
+      placementY = alignments.x.element.y;
+    }
+    if (alignments.y) {
+      placementX = alignments.y.element.x;
+    }
+
     // Create context and get transform for scale factor
     const canvas = document.querySelector("canvas");
     const ctx = canvas.getContext("2d");
@@ -347,12 +345,7 @@ export const Canvas = () => {
       const connectionId = `${connections.length + 1}C`;
       setConnections([
         ...connections,
-        new Connection(
-          connectionId,
-          mouse.transformed.x,
-          mouse.transformed.y,
-          scale
-        ),
+        new Connection(connectionId, placementX, placementY, scale),
       ]);
     };
 
@@ -374,7 +367,7 @@ export const Canvas = () => {
       const supportId = `${supports.length + 1}S`;
       setSupports([
         ...supports,
-        new Support(supportId, mouse.transformed.x, mouse.transformed.y, scale),
+        new Support(supportId, placementX, placementY, scale),
       ]);
     };
 
