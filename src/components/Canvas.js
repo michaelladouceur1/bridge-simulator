@@ -378,9 +378,20 @@ export const Canvas = () => {
     const ctx = canvas.getContext("2d");
     const { a: scale } = ctx.getTransform();
 
+    const checkIdNumber = (elements, splitValue) => {
+      if (elements.length === 0) return elements.length + 1;
+
+      const maxId = elements.reduce((acc, cv) => {
+        const idNum = Number(cv.id.split(splitValue)[0]);
+        if (idNum > acc) return idNum;
+      }, 0);
+
+      return maxId > elements.length ? maxId + 1 : elements.length + 1;
+    };
+
     // Create new Connection element
     const handleConnectionClick = () => {
-      const connectionId = `${connections.length + 1}C`;
+      const connectionId = `${checkIdNumber(connections, "C")}C`;
       setConnections([
         ...connections,
         new Connection(connectionId, placementX, placementY, scale),
@@ -389,7 +400,7 @@ export const Canvas = () => {
 
     const handleBeamClick = () => {
       if (elementHover) {
-        const beamId = `${beams.length + 1}B`;
+        const beamId = `${checkIdNumber(beams, "B")}B`;
         if (pendingElement) {
           if (pendingElement.id === elementHover.id) return;
           setBeams([...beams, new Beam(beamId, pendingElement, elementHover)]);
@@ -402,7 +413,7 @@ export const Canvas = () => {
 
     // Create new Support element
     const handleSupportClick = () => {
-      const supportId = `${supports.length + 1}S`;
+      const supportId = `${checkIdNumber(supports, "S")}S`;
       setSupports([
         ...supports,
         new Support(supportId, placementX, placementY, scale),
