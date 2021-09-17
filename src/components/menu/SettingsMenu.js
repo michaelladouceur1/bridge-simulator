@@ -4,6 +4,8 @@ Options:
   - beam dashed lines size 
   - beam line size
   - styling options
+  - grid on/off
+  - grid spacing
 */
 
 import React from "react";

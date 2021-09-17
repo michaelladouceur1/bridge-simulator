@@ -47,9 +47,26 @@ function Beam(id, el1, el2) {
   this.el1 = el1;
   this.el2 = el2;
 
+  this.calculateTextCoords = function () {
+    const offset = 15;
+    const o =
+      Math.max(this.el1.y, this.el2.y) - Math.min(this.el1.y, this.el2.y);
+    const a =
+      Math.max(this.el1.x, this.el2.x) - Math.min(this.el1.x, this.el2.x);
+    const angle = Math.atan(o / a);
+    console.log((angle / Math.PI) * 180);
+
+    return {
+      x: (this.el1.x + this.el2.x) / 2 + Math.abs(offset * Math.sin(angle)),
+      y: (this.el1.y + this.el2.y) / 2 + Math.abs(offset * Math.cos(angle)),
+    };
+  };
+
   this.draw = function (ctx) {
     console.log(ctx);
     ctx.beginPath();
+
+    // Draw beam
     ctx.setLineDash([2, 2]);
     ctx.lineWidth = 3;
     ctx.globalCompositeOperation = "destination-over";
@@ -59,6 +76,12 @@ function Beam(id, el1, el2) {
     ctx.stroke();
     ctx.globalCompositeOperation = "source-over";
     ctx.setLineDash([]);
+
+    // Add beam ID text
+    ctx.font = "Arial 10px";
+    ctx.fillStyle = "white";
+    const { x, y } = this.calculateTextCoords();
+    ctx.fillText(this.id, x, y);
     ctx.closePath();
   };
 }
@@ -183,17 +206,68 @@ export const Canvas = () => {
       el.draw(ctx);
     }
 
-    // console.log(alignments.x);
-    // console.log(alignments.y);
-    // console.log("\n\n");
-
     if (alignments.x) {
       alignments.x.draw(ctx);
     }
     if (alignments.y) {
       alignments.y.draw(ctx);
     }
+
+    // createGrid();
   }, [connections, beams, supports, alignments]);
+
+  const createGrid = () => {
+    const canvas = document.querySelector("canvas");
+    const ctx = canvas.getContext("2d");
+
+    const spacing = 15;
+    const lineWidth = 0.5;
+
+    const rows = Math.floor(window.innerHeight / spacing);
+    const cols = Math.floor(window.innerWidth / spacing);
+
+    // Columns
+    let lines = 0;
+    for (
+      let i = (window.innerWidth % cols) / 2;
+      i < window.innerWidth;
+      i += spacing
+    ) {
+      ctx.beginPath();
+      if (lines % 5 === 0) {
+        ctx.lineWidth = 3 * lineWidth;
+      } else {
+        ctx.lineWidth = lineWidth;
+      }
+      console.log(ctx.lineWidth);
+      ctx.strokeStyle = "gray";
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, innerHeight);
+      ctx.stroke();
+      ctx.closePath();
+      lines++;
+    }
+
+    lines = 0;
+    for (
+      let i = (window.innerHeight % rows) / 2;
+      i < window.innerHeight;
+      i += spacing
+    ) {
+      ctx.beginPath();
+      if (lines % 5 === 0) {
+        ctx.lineWidth = 3 * lineWidth;
+      } else {
+        ctx.lineWidth = lineWidth;
+      }
+      ctx.strokeStyle = "gray";
+      ctx.moveTo(0, i);
+      ctx.lineTo(innerWidth, i);
+      ctx.stroke();
+      ctx.closePath();
+      lines++;
+    }
+  };
 
   const handleMouseDown = (event) => {
     setMouseDown(true);
