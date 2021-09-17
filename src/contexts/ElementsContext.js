@@ -3,6 +3,7 @@ import React, { createContext, useState } from "react";
 export const ElementsContext = createContext(null);
 
 export const ElementsContextProvider = ({ children }) => {
+  const [alignments, setAlignments] = useState({ x: undefined, y: undefined });
   const [elementType, setElementType] = useState("connection");
   const [connections, setConnections] = useState([]);
   const [beams, setBeams] = useState([]);
@@ -11,6 +12,8 @@ export const ElementsContextProvider = ({ children }) => {
   return (
     <ElementsContext.Provider
       value={{
+        alignments,
+        setAlignments,
         elementType,
         setElementType,
         connections,

@@ -42,9 +42,6 @@ function Connection(id, x, y, scale) {
 }
 
 function Beam(id, el1, el2) {
-  console.log("BEAM CREATED");
-  console.log(el1);
-  console.log(el2);
   this.id = id;
   this.type = "beam";
   this.el1 = el1;
@@ -130,6 +127,8 @@ function Alignment(element, mouse, prox) {
 
 export const Canvas = () => {
   const {
+    alignments,
+    setAlignments,
     elementType,
     connections,
     setConnections,
@@ -139,9 +138,8 @@ export const Canvas = () => {
     setSupports,
   } = useContext(ElementsContext);
 
-  const { isLight } = useContext(ThemeContext);
+  const { isLight, contextMenu, setContextMenu } = useContext(ThemeContext);
 
-  const [alignments, setAlignments] = useState({ x: undefined, y: undefined });
   const [cssClasses, setCssClasses] = useState("");
   const [elementHover, setElementHover] = useState(false);
   const [mouse, setMouse] = useState({ x: undefined, y: undefined });
@@ -409,7 +407,16 @@ export const Canvas = () => {
 
   const handleContextMenu = (event) => {
     console.log(event);
-    // event.preventDefault();
+    event.preventDefault();
+    if (elementHover) {
+      const contextMenuCopy = { ...contextMenu };
+      contextMenuCopy.visible = true;
+      contextMenuCopy.element = elementHover;
+      contextMenuCopy.x = mouse.transformed.x;
+      contextMenuCopy.y = mouse.transformed.y;
+      console.log(contextMenuCopy);
+      setContextMenu(contextMenuCopy);
+    }
   };
 
   const handleWheel = (event) => {
