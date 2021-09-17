@@ -67,7 +67,6 @@ function Beam(id, el1, el2) {
     ctx.beginPath();
 
     // Draw beam
-    ctx.setLineDash([2, 2]);
     ctx.lineWidth = 3;
     ctx.globalCompositeOperation = "destination-over";
     ctx.strokeStyle = "white";
@@ -75,7 +74,6 @@ function Beam(id, el1, el2) {
     ctx.lineTo(el2.x, el2.y);
     ctx.stroke();
     ctx.globalCompositeOperation = "source-over";
-    ctx.setLineDash([]);
 
     // Add beam ID text
     ctx.font = "Arial 10px";
@@ -124,6 +122,7 @@ function Alignment(element, mouse, prox) {
     let yOffset = 0;
 
     ctx.beginPath();
+    ctx.setLineDash([3, 3]);
     if (
       this.mouse.transformed.x > this.element.x - prox &&
       this.mouse.transformed.x < this.element.x + prox
@@ -142,6 +141,7 @@ function Alignment(element, mouse, prox) {
     }
     ctx.lineWidth = 0.5;
     ctx.stroke();
+    ctx.setLineDash([]);
     ctx.closePath();
   };
 
