@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { AiOutlineClose, AiFillLock, AiFillUnlock } from "react-icons/ai";
+import { AiOutlineClose, AiFillLock } from "react-icons/ai";
 import { FaTrashAlt } from "react-icons/fa";
 import { BsArrowsMove } from "react-icons/bs";
 

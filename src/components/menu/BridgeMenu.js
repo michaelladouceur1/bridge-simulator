@@ -14,7 +14,7 @@ import { Button } from "../Button";
 import "./BridgeMenu.scss";
 
 export const BridgeMenu = (props) => {
-  const { setElementType, setConnections, setBeams, setSupports } =
+  const { setElementType, setConnections, setBeams, setSupports, setForces } =
     useContext(ElementsContext);
 
   const { isLight, setIsLight } = useContext(ThemeContext);
@@ -55,11 +55,11 @@ export const BridgeMenu = (props) => {
           <GiSpawnNode />
         </Button>
         <Button
-          className={activeButton === "vertical-force" ? "active" : ""}
+          className={activeButton === "force" ? "active" : ""}
           tooltip="Vertical Force"
           onClick={() => {
-            setActiveButton("vertical-force");
-            setElementType("vertical-force");
+            setActiveButton("force");
+            setElementType("force");
           }}
         >
           <BsArrowBarDown />
@@ -89,6 +89,7 @@ export const BridgeMenu = (props) => {
             setConnections([]);
             setBeams([]);
             setSupports([]);
+            setForces([]);
           }}
         >
           <FaTrashAlt style={{ fontSize: "1rem" }} />

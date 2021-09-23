@@ -54,7 +54,6 @@ function Beam(id, el1, el2) {
     const a =
       Math.max(this.el1.x, this.el2.x) - Math.min(this.el1.x, this.el2.x);
     const angle = Math.atan(o / a);
-    console.log((angle / Math.PI) * 180);
 
     return {
       x: (this.el1.x + this.el2.x) / 2 + Math.abs(offset * Math.sin(angle)),
@@ -63,16 +62,16 @@ function Beam(id, el1, el2) {
   };
 
   this.draw = function (ctx) {
-    console.log(ctx);
     ctx.beginPath();
+    this.path = new Path2D();
 
     // Draw beam
     ctx.lineWidth = 3;
     ctx.globalCompositeOperation = "destination-over";
     ctx.strokeStyle = "white";
-    ctx.moveTo(el1.x, el1.y);
-    ctx.lineTo(el2.x, el2.y);
-    ctx.stroke();
+    this.path.moveTo(el1.x, el1.y);
+    this.path.lineTo(el2.x, el2.y);
+    ctx.stroke(this.path);
     ctx.globalCompositeOperation = "source-over";
 
     // Add beam ID text
@@ -100,12 +99,35 @@ function Support(id, x, y, scale) {
       "M 12 12 L 6 12 L 3 9 L -3 9 L -6 12 L -12 12 L -6 -3 C -3 -9 3 -9 6 -3 L 12 12 M -3 0 A 3 3 90 0 0 3 0 A 3 3 90 0 0 -3 0"
     );
     let m = new DOMMatrix();
-    m.a = 1;
-    m.b = 0;
-    m.c = 0;
-    m.d = 1;
     m.e = this.x;
     m.f = this.y;
+    this.path.addPath(p2, m);
+    ctx.stroke(this.path);
+    ctx.fill(this.path);
+  };
+}
+
+function Force(id, element) {
+  this.id = id;
+  this.type = "force";
+  this.element = element;
+  this.magnitude = 0;
+  this.angle = 0;
+
+  this.draw = function (ctx) {
+    const offset = 40;
+    ctx.fillStyle = "#949494";
+    ctx.lineWidth = 1;
+    this.path = new Path2D();
+    this.path.rect(0, 0, 0, 0);
+    let p2 = new Path2D(
+      `M 0 ${24 + offset} L 6 ${14 + offset} L 2 ${14 + offset} M 0 ${
+        24 + offset
+      } L -6 ${14 + offset} L -2 ${14 + offset} L -2 0 L 2 0 L 2 ${14 + offset}`
+    );
+    let m = new DOMMatrix(`rotate(${this.angle}deg)`);
+    m.e = this.element.x;
+    m.f = this.element.y;
     this.path.addPath(p2, m);
     ctx.stroke(this.path);
     ctx.fill(this.path);
@@ -159,6 +181,8 @@ export const Canvas = () => {
     setBeams,
     supports,
     setSupports,
+    forces,
+    setForces,
   } = useContext(ElementsContext);
 
   const { isLight, contextMenu, setContextMenu } = useContext(ThemeContext);
@@ -194,7 +218,7 @@ export const Canvas = () => {
 
   useLayoutEffect(() => {
     // Combine all rendered elements
-    const elements = [...connections, ...beams, ...supports];
+    const elements = [...connections, ...beams, ...supports, ...forces];
 
     // Set canvas and context; Clear canvas for new render
     const canvas = document.querySelector("canvas");
@@ -214,7 +238,7 @@ export const Canvas = () => {
     }
 
     // createGrid();
-  }, [connections, beams, supports, alignments]);
+  }, [connections, beams, supports, forces, alignments]);
 
   const createGrid = () => {
     const canvas = document.querySelector("canvas");
@@ -239,7 +263,6 @@ export const Canvas = () => {
       } else {
         ctx.lineWidth = lineWidth;
       }
-      console.log(ctx.lineWidth);
       ctx.strokeStyle = "gray";
       ctx.moveTo(i, 0);
       ctx.lineTo(i, innerHeight);
@@ -277,8 +300,6 @@ export const Canvas = () => {
     setMouseDown(false);
   };
 
-  let count = 0;
-
   const handleMouseMove = (event) => {
     // Set mouse object coordinates
     const canvas = document.querySelector("canvas");
@@ -303,39 +324,46 @@ export const Canvas = () => {
       // Initialize hovered function for checking if the mouse is hovered over a connection element
       let element = undefined;
       const hovered = (el) => {
-        if (ctx.isPointInPath(el.path, mouse.original.x, mouse.original.y)) {
+        if (
+          ctx.isPointInPath(el.path, mouse.original.x, mouse.original.y) ||
+          ctx.isPointInStroke(el.path, mouse.original.x, mouse.original.y)
+        ) {
           element = el;
           return true;
         }
       };
       connections.some(hovered);
       supports.some(hovered);
+      beams.some(hovered);
 
       // Set elementHover to result of Array.some(hovered) check
       setElementHover(element);
     };
 
     const handleElementMove = () => {
-      // console.log("handleElementMove");
-      // if (!mouseDown || !elementHover) return;
-      // elementHover.x = mouse.transformed.x;
-      // elementHover.y = mouse.transformed.y;
-      // if (!pendingElement) {
-      //   if (!mouseDown || !elementHover) return;
-      //   setPendingElement(elementHover);
-      // }
-      // if (pendingElement && !mouseDown) setPendingElement(undefined);
-      // pendingElement.x = mouse.transformed.x;
-      // pendingElement.y = mouse.transformed.y;
-      // console.log(connections);
-      // if (mouseDown && elementHover && !pendingElement) {
-      //   setPendingElement(elementHover);
-      // } else if (mouseDown && pendingElement) {
-      //   pendingElement.x = mouse.transformed.x;
-      //   pendingElement.y = mouse.transformed.y;
-      // } else {
-      //   setPendingElement(undefined);
-      // }
+      /*
+      todo: Element move;
+      console.log("handleElementMove");
+      if (!mouseDown || !elementHover) return;
+      elementHover.x = mouse.transformed.x;
+      elementHover.y = mouse.transformed.y;
+      if (!pendingElement) {
+        if (!mouseDown || !elementHover) return;
+        setPendingElement(elementHover);
+      }
+      if (pendingElement && !mouseDown) setPendingElement(undefined);
+      pendingElement.x = mouse.transformed.x;
+      pendingElement.y = mouse.transformed.y;
+      console.log(connections);
+      if (mouseDown && elementHover && !pendingElement) {
+        setPendingElement(elementHover);
+      } else if (mouseDown && pendingElement) {
+        pendingElement.x = mouse.transformed.x;
+        pendingElement.y = mouse.transformed.y;
+      } else {
+        setPendingElement(undefined);
+      }
+      */
     };
 
     // Check if the mouse coords align with any of the connection elements coords
@@ -374,10 +402,12 @@ export const Canvas = () => {
       for (const element of elements) {
         // Check if vertical alignment band is valid
         if (checkAlignmentBand("x", element)) {
-          // Check if alignmentsCopy.y element does not exists
-          // Check if alignmentsCopy.y element id is equal to current checked element id
-          // Check if alignmentsCopy.y element exists and see if it is closer to the mouse than the current checked element
-          // If so, assign a new alignment to alignmentsCopy.y
+          /*
+          Check if alignmentsCopy.y element does not exists
+          Check if alignmentsCopy.y element id is equal to current checked element id
+          Check if alignmentsCopy.y element exists and see if it is closer to the mouse than the current checked element
+          If so, assign a new alignment to alignmentsCopy.y
+          */
           if (
             !alignmentsCopy.y ||
             alignmentsCopy.y.element.id === element.id ||
@@ -389,10 +419,12 @@ export const Canvas = () => {
 
         // Check if horizontal alignment band is valid
         else if (checkAlignmentBand("y", element)) {
-          // Check if alignmentsCopy.x element does not exists
-          // Check if alignmentsCopy.x element id is equal to current checked element id
-          // Check if alignmentsCopy.x element exists and see if it is closer to the mouse than the current checked element
-          // If so, assign a new alignment to alignmentsCopy.x
+          /*
+          Check if alignmentsCopy.x element does not exists
+          Check if alignmentsCopy.x element id is equal to current checked element id
+          Check if alignmentsCopy.x element exists and see if it is closer to the mouse than the current checked element
+          If so, assign a new alignment to alignmentsCopy.x
+          */
           if (
             !alignmentsCopy.x ||
             alignmentsCopy.x.element.id === element.id ||
@@ -422,20 +454,26 @@ export const Canvas = () => {
   };
 
   const handleClick = (event) => {
-    if (contextMenu.visible) return;
-    // console.log("BEAMS: ", beams);
-    // todo; The border limiting doesn't work when zoomed out currently.
-    // Check if the click was too close to the edges
-    // Bug where the elements are being drawn multiple times on zoom
-    // const border = 10;
-    // if (
-    //   mouse.transformed.x < border ||
-    //   mouse.transformed.y < border ||
-    //   mouse.transformed.x > window.innerWidth - border ||
-    //   mouse.transformed.y > window.innerHeight - border
-    // ) {
-    //   return;
-    // }
+    if (contextMenu.visible) {
+      setContextMenu(false);
+      return;
+    }
+
+    /*
+    todo: The border limiting doesn't work when zoomed out currently.
+    Check if the click was too close to the edges
+    Bug where the elements are being drawn multiple times on zoom
+    const border = 10;
+    if (
+      mouse.transformed.x < border ||
+      mouse.transformed.y < border ||
+      mouse.transformed.x > window.innerWidth - border ||
+      mouse.transformed.y > window.innerHeight - border
+    ) {
+      return;
+    }
+    */
+
     setAlignments({ x: undefined, y: undefined });
 
     let placementX = mouse.transformed.x;
@@ -464,7 +502,7 @@ export const Canvas = () => {
     };
 
     // Create new Connection element
-    const handleConnectionClick = () => {
+    const handleConnectionPlacement = () => {
       const connectionId = `${checkIdNumber(connections, "C")}C`;
       setConnections([
         ...connections,
@@ -472,7 +510,7 @@ export const Canvas = () => {
       ]);
     };
 
-    const handleBeamClick = () => {
+    const handleBeamPlacement = () => {
       if (elementHover) {
         const beamId = `${checkIdNumber(beams, "B")}B`;
         if (pendingElement) {
@@ -486,7 +524,7 @@ export const Canvas = () => {
     };
 
     // Create new Support element
-    const handleSupportClick = () => {
+    const handleSupportPlacement = () => {
       const supportId = `${checkIdNumber(supports, "S")}S`;
       setSupports([
         ...supports,
@@ -494,13 +532,24 @@ export const Canvas = () => {
       ]);
     };
 
-    if (elementType === "connection") handleConnectionClick();
-    else if (elementType === "beam") handleBeamClick();
-    else if (elementType === "support") handleSupportClick();
+    // Create new Force element
+    const handleForcePlacement = () => {
+      console.log("force click");
+      if (elementHover && elementHover.type === "connection") {
+        console.log(elementHover);
+        console.log("hovered and connection");
+        const forceId = `${checkIdNumber(forces, "F")}F`;
+        setForces([...forces, new Force(forceId, elementHover)]);
+      }
+    };
+
+    if (elementType === "connection") handleConnectionPlacement();
+    else if (elementType === "beam") handleBeamPlacement();
+    else if (elementType === "support") handleSupportPlacement();
+    else if (elementType === "force") handleForcePlacement();
   };
 
   const handleContextMenu = (event) => {
-    console.log(event);
     event.preventDefault();
     if (elementHover) {
       const contextMenuCopy = { ...contextMenu };
@@ -508,7 +557,7 @@ export const Canvas = () => {
       contextMenuCopy.element = elementHover;
       contextMenuCopy.x = mouse.transformed.x;
       contextMenuCopy.y = mouse.transformed.y;
-      console.log(contextMenuCopy);
+      // console.log(contextMenuCopy);
       setContextMenu(contextMenuCopy);
     }
   };
@@ -533,10 +582,10 @@ export const Canvas = () => {
   };
 
   const handleAuxClick = (event) => {
-    console.log(mouse);
-    console.log(connections);
-    console.log(elementHover);
-    console.log("\n\n\n");
+    // console.log(mouse);
+    // console.log(connections);
+    // console.log(elementHover);
+    // console.log("\n\n\n");
   };
 
   return (
