@@ -5,7 +5,7 @@ import { ElementsContextProvider } from "./contexts/ElementsContext";
 
 import { Canvas } from "./components/Canvas";
 import { Menu } from "./components/menu/Menu";
-import { ContextMenu } from "./components/context-menu/ContextMenu";
+import { ConnectionContextMenu } from "./components/context-menus/ConnectionContextMenu";
 import "./App.scss";
 
 export const App = () => {
@@ -14,7 +14,7 @@ export const App = () => {
       <ThemeContextProvider>
         <Menu />
         <Canvas />
-        <ContextMenu />
+        <ConnectionContextMenu />
       </ThemeContextProvider>
     </ElementsContextProvider>
   );
