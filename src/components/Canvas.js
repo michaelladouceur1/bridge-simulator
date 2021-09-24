@@ -144,34 +144,44 @@ function Force(id, element) {
 }
 
 // Alignment element
-function Alignment(element, mouse, prox) {
+function Alignment(element, mouse, prox, axis) {
   this.element = element;
   this.mouse = mouse;
 
   this.draw = function (ctx) {
+    // Parameters
+    const offsetRatio = 2;
     let xOffset = 0;
     let yOffset = 0;
 
     ctx.beginPath();
+
+    // Set style
     ctx.setLineDash([3, 3]);
+    ctx.lineWidth = 0.5;
     ctx.strokeStyle = colors.elementAux;
-    if (
-      this.mouse.transformed.x > this.element.x - prox &&
-      this.mouse.transformed.x < this.element.x + prox
-    ) {
+
+    // Set yOffset or xOffset for spacing from element
+    if (axis === "y") {
       yOffset =
-        this.element.y > this.mouse.transformed.y ? -(radius * 2) : radius * 2;
+        this.element.y > this.mouse.transformed.y
+          ? -(radius * offsetRatio)
+          : radius * offsetRatio;
     } else {
       xOffset =
-        this.element.x > this.mouse.transformed.x ? -(radius * 2) : radius * 2;
+        this.element.x > this.mouse.transformed.x
+          ? -(radius * offsetRatio)
+          : radius * offsetRatio;
     }
+
     ctx.moveTo(this.element.x + xOffset, this.element.y + yOffset);
-    if (yOffset === 0) {
+
+    // Draw alignment line
+    if (axis === "x") {
       ctx.lineTo(this.mouse.transformed.x, this.element.y);
     } else {
       ctx.lineTo(this.element.x, this.mouse.transformed.y);
     }
-    ctx.lineWidth = 0.5;
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.closePath();
@@ -380,29 +390,6 @@ export const Canvas = () => {
         moveElement.y = placementY;
         setContextMenu(contextMenuCopy);
       }
-      /*
-      todo: Element move;
-      console.log("handleElementMove");
-      if (!mouseDown || !elementHover) return;
-      elementHover.x = mouse.transformed.x;
-      elementHover.y = mouse.transformed.y;
-      if (!pendingElement) {
-        if (!mouseDown || !elementHover) return;
-        setPendingElement(elementHover);
-      }
-      if (pendingElement && !mouseDown) setPendingElement(undefined);
-      pendingElement.x = mouse.transformed.x;
-      pendingElement.y = mouse.transformed.y;
-      console.log(connections);
-      if (mouseDown && elementHover && !pendingElement) {
-        setPendingElement(elementHover);
-      } else if (mouseDown && pendingElement) {
-        pendingElement.x = mouse.transformed.x;
-        pendingElement.y = mouse.transformed.y;
-      } else {
-        setPendingElement(undefined);
-      }
-      */
     };
 
     // Check if the mouse coords align with any of the connection elements coords
@@ -452,7 +439,7 @@ export const Canvas = () => {
             alignmentsCopy.y.element.id === element.id ||
             (alignmentsCopy.y && checkProximity("y", element))
           ) {
-            alignmentsCopy.y = new Alignment(element, mouse, prox);
+            alignmentsCopy.y = new Alignment(element, mouse, prox, "y");
           }
         }
 
@@ -469,7 +456,7 @@ export const Canvas = () => {
             alignmentsCopy.x.element.id === element.id ||
             (alignmentsCopy.x && checkProximity("x", element))
           ) {
-            alignmentsCopy.x = new Alignment(element, mouse, prox);
+            alignmentsCopy.x = new Alignment(element, mouse, prox, "x");
           }
         }
 
