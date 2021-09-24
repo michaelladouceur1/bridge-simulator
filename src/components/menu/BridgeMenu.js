@@ -14,8 +14,14 @@ import { Button } from "../Button";
 import "./BridgeMenu.scss";
 
 export const BridgeMenu = (props) => {
-  const { setElementType, setConnections, setBeams, setSupports, setForces } =
-    useContext(ElementsContext);
+  const {
+    elementType,
+    setElementType,
+    setConnections,
+    setBeams,
+    setSupports,
+    setForces,
+  } = useContext(ElementsContext);
 
   const { isLight, setIsLight } = useContext(ThemeContext);
 
@@ -25,50 +31,45 @@ export const BridgeMenu = (props) => {
     <div className="default-menu">
       <div className="elements">
         <Button
-          className={activeButton === "connection" ? "active" : ""}
+          className={elementType === "connection" ? "active" : ""}
           tooltip="Connection"
           onClick={() => {
-            setActiveButton("connection");
             setElementType("connection");
           }}
         >
           <BiRadioCircle />
         </Button>
         <Button
-          className={activeButton === "beam" ? "active" : ""}
+          className={elementType === "beam" ? "active" : ""}
           tooltip="Beam"
           onClick={() => {
-            setActiveButton("beam");
             setElementType("beam");
           }}
         >
           <AiOutlineLine />
         </Button>
         <Button
-          className={activeButton === "support" ? "active" : ""}
+          className={elementType === "support" ? "active" : ""}
           tooltip="Support"
           onClick={() => {
-            setActiveButton("support");
             setElementType("support");
           }}
         >
           <GiSpawnNode />
         </Button>
         <Button
-          className={activeButton === "force" ? "active" : ""}
+          className={elementType === "force" ? "active" : ""}
           tooltip="Vertical Force"
           onClick={() => {
-            setActiveButton("force");
             setElementType("force");
           }}
         >
           <BsArrowBarDown />
         </Button>
         <Button
-          className={activeButton === "horizontal-force" ? "active" : ""}
+          className={elementType === "horizontal-force" ? "active" : ""}
           tooltip="Horizontal Force"
           onClick={() => {
-            setActiveButton("horizontal-force");
             setElementType("horizontal-force");
           }}
         >

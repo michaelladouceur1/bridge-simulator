@@ -6,6 +6,12 @@ import "./Canvas.scss";
 
 // Parameters
 const radius = 6;
+const colors = {
+  canvasBackground: "#141414",
+  elementMain: "#949494",
+  elementAux: "#666666",
+  lockedElement: "#ff6969",
+};
 
 // Connection element
 function Connection(id, x, y, scale) {
@@ -14,13 +20,14 @@ function Connection(id, x, y, scale) {
   this.x = x / scale;
   this.y = y / scale;
   this.radius = radius;
+  this.locked = false;
 
   this.draw = function (ctx) {
     this.path = new Path2D();
     ctx.beginPath();
     this.path.arc(this.x, this.y, this.radius, Math.PI * 2, false);
-    ctx.fillStyle = "#141414";
-    ctx.strokeStyle = "#949494";
+    ctx.fillStyle = colors.canvasBackground;
+    ctx.strokeStyle = this.locked ? colors.lockedElement : colors.elementAux;
     ctx.lineWidth = this.radius / 3;
     ctx.fill(this.path);
     ctx.stroke(this.path);
@@ -68,7 +75,7 @@ function Beam(id, el1, el2) {
     // Draw beam
     ctx.lineWidth = 3;
     ctx.globalCompositeOperation = "destination-over";
-    ctx.strokeStyle = "white";
+    ctx.strokeStyle = colors.elementMain;
     this.path.moveTo(el1.x, el1.y);
     this.path.lineTo(el2.x, el2.y);
     ctx.stroke(this.path);
@@ -76,7 +83,7 @@ function Beam(id, el1, el2) {
 
     // Add beam ID text
     ctx.font = "Arial 10px";
-    ctx.fillStyle = "white";
+    ctx.fillStyle = colors.elementMain;
     const { x, y } = this.calculateTextCoords();
     ctx.fillText(this.id, x, y);
     ctx.closePath();
@@ -89,9 +96,11 @@ function Support(id, x, y, scale) {
   this.type = "support";
   this.x = x / scale;
   this.y = y / scale;
+  this.locked = false;
 
   this.draw = function (ctx) {
-    ctx.fillStyle = "#949494";
+    ctx.fillStyle = this.locked ? colors.lockedElement : colors.elementMain;
+    ctx.strokeStyle = colors.elementAux;
     ctx.lineWidth = 1;
     this.path = new Path2D();
     this.path.rect(0, 0, 0, 0);
@@ -116,7 +125,7 @@ function Force(id, element) {
 
   this.draw = function (ctx) {
     const offset = 40;
-    ctx.fillStyle = "#949494";
+    ctx.fillStyle = colors.elementMain;
     ctx.lineWidth = 1;
     this.path = new Path2D();
     this.path.rect(0, 0, 0, 0);
@@ -145,6 +154,7 @@ function Alignment(element, mouse, prox) {
 
     ctx.beginPath();
     ctx.setLineDash([3, 3]);
+    ctx.strokeStyle = colors.elementAux;
     if (
       this.mouse.transformed.x > this.element.x - prox &&
       this.mouse.transformed.x < this.element.x + prox
@@ -175,6 +185,7 @@ export const Canvas = () => {
     alignments,
     setAlignments,
     elementType,
+    setElementType,
     connections,
     setConnections,
     beams,
@@ -183,15 +194,19 @@ export const Canvas = () => {
     setSupports,
     forces,
     setForces,
+    elementHover,
+    setElementHover,
+    pendingElement,
+    setPendingElement,
+    moveElement,
+    setMoveElement,
   } = useContext(ElementsContext);
 
   const { isLight, contextMenu, setContextMenu } = useContext(ThemeContext);
 
   const [cssClasses, setCssClasses] = useState("");
-  const [elementHover, setElementHover] = useState(false);
   const [mouse, setMouse] = useState({ x: undefined, y: undefined });
   const [mouseDown, setMouseDown] = useState(false);
-  const [pendingElement, setPendingElement] = useState(undefined);
 
   useEffect(() => {
     const classes = [
@@ -219,6 +234,7 @@ export const Canvas = () => {
   useLayoutEffect(() => {
     // Combine all rendered elements
     const elements = [...connections, ...beams, ...supports, ...forces];
+    console.log(elements);
 
     // Set canvas and context; Clear canvas for new render
     const canvas = document.querySelector("canvas");
@@ -298,6 +314,12 @@ export const Canvas = () => {
 
   const handleMouseUp = () => {
     setMouseDown(false);
+    if (moveElement) {
+      const contextMenuCopy = { ...contextMenu };
+      contextMenuCopy.visible = true;
+      setContextMenu(contextMenuCopy);
+      setMoveElement(undefined);
+    }
   };
 
   const handleMouseMove = (event) => {
@@ -341,6 +363,23 @@ export const Canvas = () => {
     };
 
     const handleElementMove = () => {
+      if (moveElement && !moveElement.locked) {
+        let placementX = mouse.transformed.x;
+        let placementY = mouse.transformed.y;
+        if (alignments.x && alignments.x.element.id !== moveElement.id) {
+          placementY = alignments.x.element.y;
+        }
+        if (alignments.y && alignments.y.element.id !== moveElement.id) {
+          placementX = alignments.y.element.x;
+        }
+
+        const contextMenuCopy = { ...contextMenu };
+        contextMenuCopy.x = placementX - 20;
+        contextMenuCopy.y = placementY + 20;
+        moveElement.x = placementX;
+        moveElement.y = placementY;
+        setContextMenu(contextMenuCopy);
+      }
       /*
       todo: Element move;
       console.log("handleElementMove");
@@ -449,7 +488,7 @@ export const Canvas = () => {
     };
 
     handleElementHover();
-    // handleElementMove();
+    handleElementMove();
     handleConnectionAlignment();
   };
 
@@ -555,9 +594,8 @@ export const Canvas = () => {
       const contextMenuCopy = { ...contextMenu };
       contextMenuCopy.visible = true;
       contextMenuCopy.element = elementHover;
-      contextMenuCopy.x = mouse.transformed.x;
-      contextMenuCopy.y = mouse.transformed.y;
-      // console.log(contextMenuCopy);
+      contextMenuCopy.x = contextMenuCopy.element.x - 20;
+      contextMenuCopy.y = contextMenuCopy.element.y + 20;
       setContextMenu(contextMenuCopy);
     }
   };
@@ -587,6 +625,17 @@ export const Canvas = () => {
     // console.log(elementHover);
     // console.log("\n\n\n");
   };
+
+  const handleKeyPress = (event) => {
+    console.log(event);
+  };
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "c") setElementType("connection");
+    else if (event.key === "b") setElementType("beam");
+    else if (event.key === "s") setElementType("support");
+    else if (event.key === "f") setElementType("force");
+  });
 
   return (
     <canvas

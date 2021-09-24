@@ -5,21 +5,26 @@ import { BsArrowsMove } from "react-icons/bs";
 
 import { ElementsContext } from "../../contexts/ElementsContext";
 import { ThemeContext } from "../../contexts/ThemeContext";
+import { ActionsContext } from "../../contexts/ActionsContext";
 
 import { ContextMenu } from "../common/context-menu/ContextMenu";
 
 export const ConnectionContextMenu = () => {
   const {
     setAlignments,
-    elementType,
+    setElementType,
     connections,
     setConnections,
     beams,
     setBeams,
     supports,
     setSupports,
+    forces,
+    setForces,
+    setMoveElement,
   } = useContext(ElementsContext);
-  const { contextMenu } = useContext(ThemeContext);
+
+  const { contextMenu, setContextMenu } = useContext(ThemeContext);
 
   const buttons = [
     {
@@ -38,10 +43,17 @@ export const ConnectionContextMenu = () => {
 
         // Delete beams associated with element
         const beamsCopy = [...beams];
-        const filteredBeams = beamsCopy.filter(
-          (beam) => beam.el1.id !== elementId && beam.el2.id !== elementId
-        );
+        const filteredBeams = beamsCopy.filter((beam) => {
+          return beam.el1.id !== elementId && beam.el2.id !== elementId;
+        });
         setBeams(filteredBeams);
+
+        // Delete forces associated with element
+        const forcesCopy = [...forces];
+        const filteredForces = forcesCopy.filter((force) => {
+          return force.element.id !== elementId;
+        });
+        setForces(filteredForces);
 
         // Delete connections
         if (contextMenu.element.type === "connection") {
@@ -57,10 +69,22 @@ export const ConnectionContextMenu = () => {
     {
       icon: <AiFillLock />,
       tooltip: "Lock",
+      onClick: () => {
+        const contextMenuCopy = { ...contextMenu };
+        contextMenuCopy.element.locked = true;
+        setContextMenu(contextMenuCopy);
+      },
     },
     {
       icon: <BsArrowsMove />,
       tooltip: "Move",
+      onMouseDown: () => {
+        const contextMenuCopy = { ...contextMenu };
+        contextMenuCopy.visible = false;
+        setContextMenu(contextMenuCopy);
+        setMoveElement(contextMenu.element);
+        setElementType(undefined);
+      },
     },
   ];
 

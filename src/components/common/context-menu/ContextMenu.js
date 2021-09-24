@@ -9,7 +9,7 @@ import "./ContextMenu.scss";
 
 const angle = 45;
 
-export const ContextMenu = ({ buttons }) => {
+export const ContextMenu = ({ buttons, ...args }) => {
   const { contextMenu, setContextMenu } = useContext(ThemeContext);
   const [tooltip, setTooltip] = useState(undefined);
 
@@ -57,7 +57,11 @@ export const ContextMenu = ({ buttons }) => {
                 height="40px"
                 onMouseEnter={() => setTooltip(button.tooltip)}
                 onMouseLeave={() => setTooltip(undefined)}
-                onClick={() => button.onClick()}
+                onClick={button.onClick ? () => button.onClick() : null}
+                onMouseDown={
+                  button.onMouseDown ? () => button.onMouseDown() : null
+                }
+                onMouseUp={button.onMouseUp ? () => button.onMouseUp() : null}
               >
                 {button.icon}
               </Button>
