@@ -127,6 +127,7 @@ function Force(id, element) {
     const offset = 40;
     ctx.fillStyle = colors.elementMain;
     ctx.lineWidth = 1;
+    ctx.globalCompositeOperation = "destination-over";
     this.path = new Path2D();
     this.path.rect(0, 0, 0, 0);
     let p2 = new Path2D(
@@ -140,6 +141,7 @@ function Force(id, element) {
     this.path.addPath(p2, m);
     ctx.stroke(this.path);
     ctx.fill(this.path);
+    ctx.globalCompositeOperation = "source-over";
   };
 }
 
@@ -367,6 +369,7 @@ export const Canvas = () => {
       connections.some(hovered);
       supports.some(hovered);
       beams.some(hovered);
+      forces.some(hovered);
 
       // Set elementHover to result of Array.some(hovered) check
       setElementHover(element);
