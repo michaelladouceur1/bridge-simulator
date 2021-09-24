@@ -124,16 +124,24 @@ function Force(id, element) {
   this.angle = 0;
 
   this.draw = function (ctx) {
-    const offset = 40;
+    const offset = Math.max(10, Math.min(50, this.magnitude / 10));
     ctx.fillStyle = colors.elementMain;
     ctx.lineWidth = 1;
     ctx.globalCompositeOperation = "destination-over";
     this.path = new Path2D();
     this.path.rect(0, 0, 0, 0);
     let p2 = new Path2D(
-      `M 0 ${24 + offset} L 6 ${14 + offset} L 2 ${14 + offset} M 0 ${
-        24 + offset
-      } L -6 ${14 + offset} L -2 ${14 + offset} L -2 0 L 2 0 L 2 ${14 + offset}`
+      `
+      M 0 ${24 + offset} 
+      L 6 ${14 + offset} 
+      L 2 ${14 + offset} 
+      M 0 ${24 + offset} 
+      L -6 ${14 + offset} 
+      L -2 ${14 + offset} 
+      L -2 10 
+      L 2 10 
+      L 2 ${14 + offset}
+      `
     );
     let m = new DOMMatrix(`rotate(${this.angle}deg)`);
     m.e = this.element.x;
