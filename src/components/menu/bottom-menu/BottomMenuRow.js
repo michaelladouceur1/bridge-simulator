@@ -31,16 +31,34 @@ export const BottomMenuRow = (props) => {
           rowExpanded ? "expanded" : "collapsed"
         }`}
       >
-        <input
-          value={element.x}
-          onChange={(event) => {
-            const value = Number(event.target.value);
-            const el = { ...activeElement };
-            el.x = value;
-            console.log(el);
-            setActiveElement(el);
-          }}
-        ></input>
+        <div>
+          <label for="x-coord">X</label>
+          <input
+            id="x-coord"
+            value={element.x}
+            onChange={(event) => {
+              const value = Number(event.target.value);
+              const el = { ...activeElement };
+              el.x = value;
+              console.log(el);
+              setActiveElement(el);
+            }}
+          ></input>
+        </div>
+        <div>
+          <label for="y-coord">Y</label>
+          <input
+            id="y-coord"
+            value={element.y}
+            onChange={(event) => {
+              const value = Number(event.target.value);
+              const el = { ...activeElement };
+              el.x = value;
+              console.log(el);
+              setActiveElement(el);
+            }}
+          ></input>
+        </div>
       </div>
     </div>
   );
