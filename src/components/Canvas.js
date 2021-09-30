@@ -254,7 +254,7 @@ export const Canvas = () => {
   useLayoutEffect(() => {
     // Combine all rendered elements
     const elements = [...connections, ...beams, ...supports, ...forces];
-    console.log(elements);
+    // console.log(elements);
 
     // Set canvas and context; Clear canvas for new render
     const canvas = document.querySelector("canvas");

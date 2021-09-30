@@ -1,0 +1,76 @@
+// @import "../../../App.scss";
+@import "../../../App.scss";
+@import "../Menu.scss";
+
+.bottom-menu-content-row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: $dark-button-color;
+  width: 90%;
+  margin: 0;
+  border-radius: $border-radius;
+  // transition: $transition-speed;
+
+  &:not(:first-child) {
+    margin-top: $padding;
+  }
+
+  &:hover {
+    background-color: $dark-button-hover-color;
+    // color: $light-text-color;
+  }
+
+  p {
+    font-size: 0.8rem;
+  }
+
+  input {
+    font-size: 0.7rem;
+    height: 15px;
+    width: 50px;
+  }
+
+  .bottom-menu-content-row-top {
+    height: 40px;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    p {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    p:first-child {
+      width: 50px;
+      height: 100%;
+      border-right: 1px solid $dark-menu-color;
+    }
+  }
+
+  .bottom-menu-content-row-bottom {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid $dark-menu-color;
+    transition: $transition-speed;
+  }
+
+  .expanded {
+    height: 50px;
+    transition: $transition-speed;
+  }
+
+  .collapsed {
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: $transition-speed;
+  }
+}

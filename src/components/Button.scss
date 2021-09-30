@@ -29,11 +29,7 @@ button {
     color: $dark-text-color;
 
     &:hover {
-      background: $light-background-color !important;
-
-      svg {
-        fill: $dark-background-color !important;
-      }
+      background: $dark-button-hover-color !important;
     }
 
     &.active {
@@ -54,11 +50,11 @@ button {
     color: $light-text-color;
 
     &:hover {
-      background: $dark-background-color !important;
+      background: $light-button-hover-color !important;
 
-      svg {
-        fill: $light-background-color !important;
-      }
+      // svg {
+      //   fill: $light-background-color !important;
+      // }
     }
 
     &.active {

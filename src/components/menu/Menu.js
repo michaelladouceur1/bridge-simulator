@@ -1,16 +1,17 @@
 import React, { useState, useContext } from "react";
+
 import {
-  BiRightArrow,
-  BiLeftArrow,
-  BiDownArrow,
-  BiUpArrow,
-} from "react-icons/bi";
+  RiArrowDropRightLine,
+  RiArrowDropLeftLine,
+  RiArrowDropDownLine,
+  RiArrowDropUpLine,
+} from "react-icons/ri";
 
 import { ThemeContext } from "../../contexts/ThemeContext";
 
-import { MainMenu } from "./MainMenu";
-import { SideMenu } from "./SideMenu";
-import { BottomMenu } from "./BottomMenu";
+import { MainMenu } from "./main-menu/MainMenu";
+import { SideMenu } from "./side-menu/SideMenu";
+import { BottomMenu } from "./bottom-menu/BottomMenu";
 
 import "./Menu.scss";
 
@@ -36,12 +37,12 @@ export const Menu = (props) => {
           sideMenuExpanded={sideMenuExpanded}
         />
       </div>
-      <BottomMenu />
+      <BottomMenu bottomMenuExpanded={bottomMenuExpanded} />
       <div className="arrow side-arrow">
         {sideMenuExpanded ? (
-          <BiLeftArrow onClick={() => setSideMenuExpanded(false)} />
+          <RiArrowDropLeftLine onClick={() => setSideMenuExpanded(false)} />
         ) : (
-          <BiRightArrow
+          <RiArrowDropRightLine
             onClick={() => {
               setSideMenuExpanded(true);
               setBottomMenuExpanded(false);
@@ -51,9 +52,9 @@ export const Menu = (props) => {
       </div>
       <div className="arrow bottom-arrow">
         {bottomMenuExpanded ? (
-          <BiUpArrow onClick={() => setBottomMenuExpanded(false)} />
+          <RiArrowDropUpLine onClick={() => setBottomMenuExpanded(false)} />
         ) : (
-          <BiDownArrow
+          <RiArrowDropDownLine
             onClick={() => {
               setBottomMenuExpanded(true);
               setSideMenuExpanded(false);

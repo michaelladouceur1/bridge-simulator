@@ -1,0 +1,30 @@
+@import "../../../App.scss";
+@import "../Menu.scss";
+
+@function bottomMenuContentHeight() {
+  @return $main-menu-height * 0.9;
+}
+
+@function bottomMenuContentWidth() {
+  @return $main-menu-width * 0.9;
+}
+
+.bottom-menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: $bottom-menu-height;
+  width: $main-menu-width;
+}
+
+.bottom-menu-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: bottomMenuContentHeight();
+  width: bottomMenuContentWidth();
+
+  h3 {
+    font-size: 0.85rem;
+  }
+}

@@ -6,10 +6,10 @@ import { FaTrashAlt } from "react-icons/fa";
 import { BsArrowBarDown, BsArrowBarRight, BsSun, BsMoon } from "react-icons/bs";
 import { VscRunAll } from "react-icons/vsc";
 
-import { ElementsContext } from "../../contexts/ElementsContext";
-import { ThemeContext } from "../../contexts/ThemeContext";
+import { ElementsContext } from "../../../contexts/ElementsContext";
+import { ThemeContext } from "../../../contexts/ThemeContext";
 
-import { Button } from "../Button";
+import { Button } from "../../Button";
 
 import "./BridgeMenu.scss";
 

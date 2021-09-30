@@ -1,0 +1,11 @@
+@import "../Menu.scss";
+
+.bridge-bottom-menu {
+  height: $bottom-menu-height;
+  width: $main-menu-width;
+  overflow-y: scroll;
+}
+
+.bridge-bottom-menu::-webkit-scrollbar {
+  display: none;
+}
