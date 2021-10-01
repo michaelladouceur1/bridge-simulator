@@ -48,6 +48,7 @@ function Connection(id, x, y, scale) {
   };
 }
 
+// Beam element
 function Beam(id, el1, el2) {
   this.id = id;
   this.type = "beam";
@@ -622,10 +623,6 @@ export const Canvas = () => {
     // console.log(connections);
     // console.log(elementHover);
     // console.log("\n\n\n");
-  };
-
-  const handleKeyPress = (event) => {
-    console.log(event);
   };
 
   window.addEventListener("keydown", (event) => {

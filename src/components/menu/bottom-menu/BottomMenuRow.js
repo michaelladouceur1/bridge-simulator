@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 
 import { AiFillLock } from "react-icons/ai";
 import { FaTrashAlt } from "react-icons/fa";
+
+import { ElementsContext } from "../../../contexts/ElementsContext";
 
 import { Button } from "../../Button";
 
@@ -10,8 +12,25 @@ import "./BottomMenuRow.scss";
 export const BottomMenuRow = (props) => {
   const { element } = props;
 
+  const { connections, setConnections } = useContext(ElementsContext);
+
   const [rowExpanded, setRowExpanded] = useState(false);
   const [activeElement, setActiveElement] = useState(element);
+
+  const updateConnections = (element) => {
+    const connectionsCopy = [...connections];
+    const filteredConnectionsCopy = connectionsCopy.filter(
+      (el) => el.id !== element.id
+    );
+    const finalConnections = [...filteredConnectionsCopy, element].sort(
+      (a, b) => {
+        if (a.id > b.id) return 1;
+        else return -1;
+      }
+    );
+    console.log(connections);
+    setConnections(finalConnections);
+  };
 
   const capitalize = (value) => {
     return value.charAt(0).toUpperCase() + value.slice(1);
@@ -37,11 +56,14 @@ export const BottomMenuRow = (props) => {
             id="x-coord"
             value={element.x}
             onChange={(event) => {
-              const value = Number(event.target.value);
-              const el = { ...activeElement };
-              el.x = value;
-              console.log(el);
-              setActiveElement(el);
+              const elementCopy = { ...element };
+              elementCopy.x = Number(event.target.value);
+              updateConnections(elementCopy);
+              // const value = Number(event.target.value);
+              // const el = { ...activeElement };
+              // element.x = value;
+              // console.log(el);
+              // setActiveElement(el);
             }}
           ></input>
         </div>
