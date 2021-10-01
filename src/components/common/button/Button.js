@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 
-import { ThemeContext } from "../contexts/ThemeContext";
+import { ThemeContext } from "../../../contexts/ThemeContext";
 
 import "./Button.scss";
 

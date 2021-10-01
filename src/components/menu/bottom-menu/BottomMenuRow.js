@@ -5,7 +5,7 @@ import { FaTrashAlt } from "react-icons/fa";
 
 import { ElementsContext } from "../../../contexts/ElementsContext";
 
-import { Button } from "../../Button";
+import { Button } from "../../common/button/Button";
 
 import "./BottomMenuRow.scss";
 

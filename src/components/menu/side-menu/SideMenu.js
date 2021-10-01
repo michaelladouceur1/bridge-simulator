@@ -3,7 +3,7 @@ import { BiRadioCircle } from "react-icons/bi";
 import { MdSettings, MdAccountBox } from "react-icons/md";
 import { GiArchBridge } from "react-icons/gi";
 
-import { Button } from "../../Button";
+import { Button } from "../../common/button/Button";
 
 import "./SideMenu.scss";
 

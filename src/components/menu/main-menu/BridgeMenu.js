@@ -9,7 +9,7 @@ import { VscRunAll } from "react-icons/vsc";
 import { ElementsContext } from "../../../contexts/ElementsContext";
 import { ThemeContext } from "../../../contexts/ThemeContext";
 
-import { Button } from "../../Button";
+import { Button } from "../../common/button/Button";
 
 import "./BridgeMenu.scss";
 

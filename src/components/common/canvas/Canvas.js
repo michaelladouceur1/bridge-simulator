@@ -1,9 +1,10 @@
 import React, { useState, useLayoutEffect, useContext, useEffect } from "react";
-import { ElementsContext } from "../contexts/ElementsContext";
-import { ThemeContext } from "../contexts/ThemeContext";
+import { ElementsContext } from "../../../contexts/ElementsContext";
+import { ThemeContext } from "../../../contexts/ThemeContext";
 
 import "./Canvas.scss";
 
+// todo Default colors needed
 // Parameters
 const radius = 6;
 const colors = {
@@ -227,9 +228,11 @@ export const Canvas = () => {
 
   const [cssClasses, setCssClasses] = useState("");
   const [mouse, setMouse] = useState({ x: undefined, y: undefined });
-  const [mouseDown, setMouseDown] = useState(false);
 
+  // todo
   useEffect(() => {
+    // todo Classes should be passed in as props
+    // todo Default classes should be there in case classes aren't passed as props
     const classes = [
       {
         value: elementHover,
@@ -252,10 +255,12 @@ export const Canvas = () => {
     setCssClasses(classesString);
   }, [elementHover, isLight]);
 
+  // todo
   useLayoutEffect(() => {
     // Combine all rendered elements
+
+    // todo Elements should be passed in as props
     const elements = [...connections, ...beams, ...supports, ...forces];
-    // console.log(elements);
 
     // Set canvas and context; Clear canvas for new render
     const canvas = document.querySelector("canvas");
@@ -329,20 +334,7 @@ export const Canvas = () => {
     }
   };
 
-  const handleMouseDown = (event) => {
-    setMouseDown(true);
-  };
-
-  const handleMouseUp = () => {
-    setMouseDown(false);
-    if (moveElement) {
-      const contextMenuCopy = { ...contextMenu };
-      contextMenuCopy.visible = true;
-      setContextMenu(contextMenuCopy);
-      setMoveElement(undefined);
-    }
-  };
-
+  // todo
   const handleMouseMove = (event) => {
     // Set mouse object coordinates
     const canvas = document.querySelector("canvas");
@@ -362,9 +354,11 @@ export const Canvas = () => {
       },
     });
 
+    // todo Function should use elements prop that gets passed in
     // Check if the mouse is hovering over the same position as a connection element
     const handleElementHover = () => {
       // Initialize hovered function for checking if the mouse is hovered over a connection element
+      const elements = [...connections, ...beams, ...supports, ...forces];
       let element = undefined;
       const hovered = (el) => {
         if (
@@ -375,10 +369,8 @@ export const Canvas = () => {
           return true;
         }
       };
-      connections.some(hovered);
-      supports.some(hovered);
-      beams.some(hovered);
-      forces.some(hovered);
+
+      elements.some(hovered);
 
       // Set elementHover to result of Array.some(hovered) check
       setElementHover(element);
@@ -395,6 +387,7 @@ export const Canvas = () => {
           placementX = alignments.y.element.x;
         }
 
+        // todo Potentially have contextMenu be passed in as prop
         const contextMenuCopy = { ...contextMenu };
         contextMenuCopy.x = placementX - 20;
         contextMenuCopy.y = placementY + 20;
@@ -404,6 +397,7 @@ export const Canvas = () => {
       }
     };
 
+    // todo Passed in elements should have an aligned parameter to see if alignments apply to them. If not, return
     // Check if the mouse coords align with any of the connection elements coords
     const handleConnectionAlignment = () => {
       if (elementType === "beam") return;
@@ -491,6 +485,7 @@ export const Canvas = () => {
     handleConnectionAlignment();
   };
 
+  // todo
   const handleClick = (event) => {
     if (contextMenu.visible) {
       setContextMenu(false);
@@ -539,6 +534,7 @@ export const Canvas = () => {
       return maxId > elements.length ? maxId + 1 : elements.length + 1;
     };
 
+    // todo Placement functions should be passed in as props
     // Create new Connection element
     const handleConnectionPlacement = () => {
       const connectionId = `${checkIdNumber(connections, "C")}C`;
@@ -587,6 +583,7 @@ export const Canvas = () => {
     else if (elementType === "force") handleForcePlacement();
   };
 
+  // todo Potentially pass contextMenu in as prop
   const handleContextMenu = (event) => {
     event.preventDefault();
     if (elementHover) {
@@ -625,6 +622,7 @@ export const Canvas = () => {
     // console.log("\n\n\n");
   };
 
+  // todo Event listeners should be props ie: [{key: 'c', action: ()=>setElementType('connection')}]
   window.addEventListener("keydown", (event) => {
     if (event.key === "c") setElementType("connection");
     else if (event.key === "b") setElementType("beam");
@@ -637,12 +635,9 @@ export const Canvas = () => {
       className={cssClasses}
       width={window.innerWidth}
       height={window.innerHeight}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
       onClick={handleClick}
       onContextMenu={handleContextMenu}
-      // onWheel={handleWheel}
       onAuxClick={handleAuxClick}
     />
   );

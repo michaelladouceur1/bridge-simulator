@@ -3,7 +3,7 @@ import { AiOutlineClose } from "react-icons/ai";
 
 import { ThemeContext } from "../../../contexts/ThemeContext";
 
-import { Button } from "../../Button";
+import { Button } from "../button/Button";
 
 import "./ContextMenu.scss";
 
