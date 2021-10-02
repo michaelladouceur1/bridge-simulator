@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useContext, useEffect } from "react";
+import { useState, useLayoutEffect, useContext, useEffect } from "react";
 import { ElementsContext } from "../../../contexts/ElementsContext";
 import { ThemeContext } from "../../../contexts/ThemeContext";
 
@@ -13,147 +13,6 @@ const colors = {
   elementAux: "#666666",
   lockedElement: "#ff6969",
 };
-
-// Connection element
-function Connection(id, x, y, scale) {
-  this.id = id;
-  this.type = "connection";
-  this.x = x / scale;
-  this.y = y / scale;
-  this.radius = radius;
-  this.locked = false;
-
-  this.draw = function (ctx) {
-    this.path = new Path2D();
-    ctx.beginPath();
-    this.path.arc(this.x, this.y, this.radius, Math.PI * 2, false);
-    ctx.fillStyle = colors.canvasBackground;
-    ctx.strokeStyle = this.locked ? colors.lockedElement : colors.elementAux;
-    ctx.lineWidth = this.radius / 3;
-    ctx.fill(this.path);
-    ctx.stroke(this.path);
-    ctx.closePath();
-  };
-
-  this.scale = function (s) {
-    const A = [
-      [s, 0],
-      [0, s],
-    ];
-    this.v = numeric.dot(A, this.v);
-  };
-
-  this.translate = function (xTranslate, yTranslate) {
-    this.displayX += xTranslate;
-    this.displayY += yTranslate;
-  };
-}
-
-// Beam element
-function Beam(id, el1, el2) {
-  this.id = id;
-  this.type = "beam";
-  this.el1 = el1;
-  this.el2 = el2;
-
-  this.calculateTextCoords = function () {
-    const offset = 15;
-    const o =
-      Math.max(this.el1.y, this.el2.y) - Math.min(this.el1.y, this.el2.y);
-    const a =
-      Math.max(this.el1.x, this.el2.x) - Math.min(this.el1.x, this.el2.x);
-    const angle = Math.atan(o / a);
-
-    return {
-      x: (this.el1.x + this.el2.x) / 2 + Math.abs(offset * Math.sin(angle)),
-      y: (this.el1.y + this.el2.y) / 2 + Math.abs(offset * Math.cos(angle)),
-    };
-  };
-
-  this.draw = function (ctx) {
-    ctx.beginPath();
-    this.path = new Path2D();
-
-    // Draw beam
-    ctx.lineWidth = 3;
-    ctx.globalCompositeOperation = "destination-over";
-    ctx.strokeStyle = colors.elementMain;
-    this.path.moveTo(el1.x, el1.y);
-    this.path.lineTo(el2.x, el2.y);
-    ctx.stroke(this.path);
-    ctx.globalCompositeOperation = "source-over";
-
-    // Add beam ID text
-    ctx.font = "Arial 10px";
-    ctx.fillStyle = colors.elementMain;
-    const { x, y } = this.calculateTextCoords();
-    ctx.fillText(this.id, x, y);
-    ctx.closePath();
-  };
-}
-
-// Support element
-function Support(id, x, y, scale) {
-  this.id = id;
-  this.type = "support";
-  this.x = x / scale;
-  this.y = y / scale;
-  this.locked = false;
-
-  this.draw = function (ctx) {
-    ctx.fillStyle = this.locked ? colors.lockedElement : colors.elementMain;
-    ctx.strokeStyle = colors.elementAux;
-    ctx.lineWidth = 1;
-    this.path = new Path2D();
-    this.path.rect(0, 0, 0, 0);
-    let p2 = new Path2D(
-      "M 12 12 L 6 12 L 3 9 L -3 9 L -6 12 L -12 12 L -6 -3 C -3 -9 3 -9 6 -3 L 12 12 M -3 0 A 3 3 90 0 0 3 0 A 3 3 90 0 0 -3 0"
-    );
-    let m = new DOMMatrix();
-    m.e = this.x;
-    m.f = this.y;
-    this.path.addPath(p2, m);
-    ctx.stroke(this.path);
-    ctx.fill(this.path);
-  };
-}
-
-function Force(id, element) {
-  this.id = id;
-  this.type = "force";
-  this.element = element;
-  this.magnitude = 0;
-  this.angle = 0;
-
-  this.draw = function (ctx) {
-    const offset = Math.max(10, Math.min(50, this.magnitude / 10));
-    ctx.fillStyle = colors.elementMain;
-    ctx.lineWidth = 1;
-    ctx.globalCompositeOperation = "destination-over";
-    this.path = new Path2D();
-    this.path.rect(0, 0, 0, 0);
-    let p2 = new Path2D(
-      `
-      M 0 ${24 + offset} 
-      L 6 ${14 + offset} 
-      L 2 ${14 + offset} 
-      M 0 ${24 + offset} 
-      L -6 ${14 + offset} 
-      L -2 ${14 + offset} 
-      L -2 10 
-      L 2 10 
-      L 2 ${14 + offset}
-      `
-    );
-    let m = new DOMMatrix(`rotate(${this.angle}deg)`);
-    m.e = this.element.x;
-    m.f = this.element.y;
-    this.path.addPath(p2, m);
-    ctx.stroke(this.path);
-    ctx.fill(this.path);
-    ctx.globalCompositeOperation = "source-over";
-  };
-}
 
 // Alignment element
 function Alignment(element, mouse, prox, axis) {
@@ -202,43 +61,42 @@ function Alignment(element, mouse, prox, axis) {
   this.update = function () {};
 }
 
-export const Canvas = () => {
+export const Canvas = (props) => {
+  const {
+    classes,
+    elements,
+    placements,
+    cssClasses = [],
+    keypressEventListeners,
+  } = props;
+
   const {
     alignments,
     setAlignments,
     elementType,
-    setElementType,
-    connections,
-    setConnections,
-    beams,
-    setBeams,
-    supports,
-    setSupports,
-    forces,
-    setForces,
     elementHover,
     setElementHover,
-    pendingElement,
-    setPendingElement,
     moveElement,
-    setMoveElement,
   } = useContext(ElementsContext);
 
   const { isLight, contextMenu, setContextMenu } = useContext(ThemeContext);
 
-  const [cssClasses, setCssClasses] = useState("");
+  const [appliedCssClasses, setAppliedCssClasses] = useState("");
   const [mouse, setMouse] = useState({ x: undefined, y: undefined });
 
   // todo
   useEffect(() => {
-    // todo Classes should be passed in as props
+    // todo CSS classes should be passed in as props
     // todo Default classes should be there in case classes aren't passed as props
-    const classes = [
+    const standardCssClasses = [
       {
         value: elementHover,
         classTrue: "hovered",
         classFalse: "",
       },
+    ];
+
+    const defaultCssClasses = [
       {
         value: isLight,
         classTrue: "dark",
@@ -246,21 +104,26 @@ export const Canvas = () => {
       },
     ];
 
-    const classesString = classes
+    const classesString = [
+      ...standardCssClasses,
+      ...defaultCssClasses,
+      ...cssClasses,
+    ]
       .map((obj) => {
         return obj.value || obj.value === true ? obj.classTrue : obj.classFalse;
       })
       .join(" ");
 
-    setCssClasses(classesString);
+    setAppliedCssClasses(classesString);
   }, [elementHover, isLight]);
 
+  // * Complete
   // todo
   useLayoutEffect(() => {
     // Combine all rendered elements
 
     // todo Elements should be passed in as props
-    const elements = [...connections, ...beams, ...supports, ...forces];
+    const allElements = getAllElements();
 
     // Set canvas and context; Clear canvas for new render
     const canvas = document.querySelector("canvas");
@@ -268,7 +131,7 @@ export const Canvas = () => {
     ctx.clearRect(0, 0, innerWidth, innerHeight);
 
     // Render elements
-    for (const el of elements) {
+    for (const el of allElements) {
       el.draw(ctx);
     }
 
@@ -280,7 +143,22 @@ export const Canvas = () => {
     }
 
     // createGrid();
-  }, [connections, beams, supports, forces, alignments]);
+  }, [...elements, alignments]);
+
+  const getAllElements = () => {
+    return elements.reduce((acc, cv) => [...acc, ...cv]);
+  };
+
+  const getAlignedElements = () => {
+    return getAllElements().filter((element) => element.aligned === true);
+  };
+
+  const getUnalignedElementsType = () => {
+    return classes
+      .map((cls) => new cls())
+      .filter((inst) => inst.aligned === false)
+      .map((unaligned) => unaligned.type);
+  };
 
   const createGrid = () => {
     const canvas = document.querySelector("canvas");
@@ -334,6 +212,7 @@ export const Canvas = () => {
     }
   };
 
+  // * Complete
   // todo
   const handleMouseMove = (event) => {
     // Set mouse object coordinates
@@ -354,11 +233,12 @@ export const Canvas = () => {
       },
     });
 
+    // * Complete
     // todo Function should use elements prop that gets passed in
     // Check if the mouse is hovering over the same position as a connection element
     const handleElementHover = () => {
       // Initialize hovered function for checking if the mouse is hovered over a connection element
-      const elements = [...connections, ...beams, ...supports, ...forces];
+      const elements = getAllElements();
       let element = undefined;
       const hovered = (el) => {
         if (
@@ -397,13 +277,14 @@ export const Canvas = () => {
       }
     };
 
+    // * Complete
     // todo Passed in elements should have an aligned parameter to see if alignments apply to them. If not, return
     // Check if the mouse coords align with any of the connection elements coords
     const handleConnectionAlignment = () => {
-      if (elementType === "beam") return;
+      if (getUnalignedElementsType().includes(elementType)) return;
 
       const prox = 15;
-      const elements = [...connections, ...supports];
+      const elements = getAlignedElements();
       const alignmentsCopy = { ...alignments };
 
       const checkAlignmentBand = (coord, element) => {
@@ -534,53 +415,15 @@ export const Canvas = () => {
       return maxId > elements.length ? maxId + 1 : elements.length + 1;
     };
 
-    // todo Placement functions should be passed in as props
-    // Create new Connection element
-    const handleConnectionPlacement = () => {
-      const connectionId = `${checkIdNumber(connections, "C")}C`;
-      setConnections([
-        ...connections,
-        new Connection(connectionId, placementX, placementY, scale),
-      ]);
-    };
-
-    const handleBeamPlacement = () => {
-      if (elementHover) {
-        const beamId = `${checkIdNumber(beams, "B")}B`;
-        if (pendingElement) {
-          if (pendingElement.id === elementHover.id) return;
-          setBeams([...beams, new Beam(beamId, pendingElement, elementHover)]);
-          setPendingElement(undefined);
-        } else {
-          setPendingElement(elementHover);
-        }
-      }
-    };
-
-    // Create new Support element
-    const handleSupportPlacement = () => {
-      const supportId = `${checkIdNumber(supports, "S")}S`;
-      setSupports([
-        ...supports,
-        new Support(supportId, placementX, placementY, scale),
-      ]);
-    };
-
-    // Create new Force element
-    const handleForcePlacement = () => {
-      console.log("force click");
-      if (elementHover && elementHover.type === "connection") {
-        console.log(elementHover);
-        console.log("hovered and connection");
-        const forceId = `${checkIdNumber(forces, "F")}F`;
-        setForces([...forces, new Force(forceId, elementHover)]);
-      }
-    };
-
-    if (elementType === "connection") handleConnectionPlacement();
-    else if (elementType === "beam") handleBeamPlacement();
-    else if (elementType === "support") handleSupportPlacement();
-    else if (elementType === "force") handleForcePlacement();
+    if (elementType) {
+      const place = placements[elementType];
+      place.action({
+        id: `${checkIdNumber(place.elements, place.id)}${place.id}`,
+        placementX: placementX,
+        placementY: placementY,
+        scale: scale,
+      });
+    }
   };
 
   // todo Potentially pass contextMenu in as prop
@@ -622,17 +465,17 @@ export const Canvas = () => {
     // console.log("\n\n\n");
   };
 
+  // * Cleanup for final version
   // todo Event listeners should be props ie: [{key: 'c', action: ()=>setElementType('connection')}]
   window.addEventListener("keydown", (event) => {
-    if (event.key === "c") setElementType("connection");
-    else if (event.key === "b") setElementType("beam");
-    else if (event.key === "s") setElementType("support");
-    else if (event.key === "f") setElementType("force");
+    keypressEventListeners.forEach((listener) => {
+      if (event.key === listener.key) listener.action();
+    });
   });
 
   return (
     <canvas
-      className={cssClasses}
+      className={appliedCssClasses}
       width={window.innerWidth}
       height={window.innerHeight}
       onMouseMove={handleMouseMove}
