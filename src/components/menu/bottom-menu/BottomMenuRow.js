@@ -12,21 +12,10 @@ import "./BottomMenuRow.scss";
 export const BottomMenuRow = (props) => {
   const { element } = props;
 
-  const { connections, setConnections, supports, setSupports } =
-    useContext(ElementsContext);
+  const { updateConnection } = useContext(ElementsContext);
 
   const [rowExpanded, setRowExpanded] = useState(false);
   const [activeElement, setActiveElement] = useState(element);
-
-  const updateConnections = (elementId, axis, value) => {
-    const connectionsCopy = [...connections];
-    connectionsCopy.forEach((element) => {
-      if (element.id === elementId) {
-        element[axis] = Number(value);
-      }
-    });
-    setConnections(connectionsCopy);
-  };
 
   const capitalize = (value) => {
     return value.charAt(0).toUpperCase() + value.slice(1);
@@ -55,7 +44,9 @@ export const BottomMenuRow = (props) => {
             onChange={(event) => {
               const elementId = element.id;
               const xValue = event.target.value;
-              updateConnections(elementId, "x", xValue);
+              updateConnection(() => {
+                element.x = Number(xValue);
+              }, elementId);
             }}
           ></input>
         </div>
@@ -68,7 +59,9 @@ export const BottomMenuRow = (props) => {
             onChange={(event) => {
               const elementId = element.id;
               const yValue = event.target.value;
-              updateConnections(elementId, "y", yValue);
+              updateConnection(() => {
+                element.y = Number(yValue);
+              }, elementId);
             }}
           ></input>
         </div>

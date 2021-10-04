@@ -19,6 +19,8 @@ export const BridgeCanvas = () => {
     elementHover,
     pendingElement,
     setPendingElement,
+    updateConnection,
+    updateSupport,
   } = useContext(ElementsContext);
 
   const classes = [Connection, Beam, Support, Force];
@@ -43,7 +45,19 @@ export const BridgeCanvas = () => {
         if (elementHover) {
           if (pendingElement) {
             if (pendingElement.id === elementHover.id) return;
-            setBeams([...beams, new Beam(id, pendingElement, elementHover)]);
+            const newBeam = new Beam(id, pendingElement, elementHover);
+            setBeams([...beams, newBeam]);
+            [pendingElement, elementHover].forEach((element) => {
+              if (element.type === "connection") {
+                updateConnection(() => {
+                  element.beams.push(newBeam);
+                }, element.id);
+              } else if (element.type === "support") {
+                updateSupport(() => {
+                  element.beams.push(newBeam);
+                }, element.id);
+              }
+            });
             setPendingElement(undefined);
           } else {
             setPendingElement(elementHover);

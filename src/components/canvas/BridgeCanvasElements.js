@@ -105,6 +105,7 @@ export function Support(id, x, y, scale) {
   this.type = "support";
   this.x = x / scale;
   this.y = y / scale;
+  this.beams = [];
   this.aligned = true;
   this.locked = false;
 
@@ -131,7 +132,7 @@ export function Force(id, element) {
   this.type = "force";
   this.element = element;
   this.aligned = false;
-  this.magnitude = 0;
+  this.magnitude = 100;
   this.angle = 0;
 
   this.draw = function (ctx) {

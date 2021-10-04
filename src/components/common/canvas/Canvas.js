@@ -137,7 +137,7 @@ export const Canvas = (props) => {
 
     // todo Elements should be passed in as props
     const allElements = getAllElements();
-    console.log(allElements);
+    // console.log(allElements);
 
     // Set canvas and context; Clear canvas for new render
     const canvas = document.querySelector("canvas");
