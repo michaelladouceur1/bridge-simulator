@@ -11,6 +11,7 @@ export function Connection(id, x, y, scale) {
   this.type = "connection";
   this.x = x / scale;
   this.y = y / scale;
+  this.beams = [];
   this.aligned = true;
   this.radius = radius;
   this.locked = false;
@@ -46,7 +47,20 @@ export function Beam(id, el1, el2) {
   this.type = "beam";
   this.el1 = el1;
   this.el2 = el2;
+  this.length = 0;
   this.aligned = false;
+
+  this.calculateLength = function () {
+    const ySquared = Math.pow(
+      Math.max(this.el1.y, this.el2.y) - Math.min(this.el1.y, this.el2.y),
+      2
+    );
+    const xSquared = Math.pow(
+      Math.max(this.el1.x, this.el2.x) - Math.min(this.el1.x, this.el2.x),
+      2
+    );
+    this.length = Math.sqrt(ySquared + xSquared);
+  };
 
   this.calculateTextCoords = function () {
     const offset = 15;
@@ -63,6 +77,8 @@ export function Beam(id, el1, el2) {
   };
 
   this.draw = function (ctx) {
+    this.calculateLength();
+    // console.log(this);
     ctx.beginPath();
     this.path = new Path2D();
 
@@ -79,7 +95,7 @@ export function Beam(id, el1, el2) {
     ctx.font = "Arial 10px";
     ctx.fillStyle = colors.elementMain;
     const { x, y } = this.calculateTextCoords();
-    ctx.fillText(this.id, x, y);
+    ctx.fillText(`${this.id} - ${this.length.toFixed(2)}`, x, y);
     ctx.closePath();
   };
 }

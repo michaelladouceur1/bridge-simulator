@@ -89,6 +89,15 @@ export const BridgeCanvas = () => {
       key: "f",
       action: () => setElementType("force"),
     },
+    {
+      key: "d",
+      action: () => {
+        setConnections([]);
+        setBeams([]);
+        setSupports([]);
+        setForces([]);
+      },
+    },
   ];
 
   return (

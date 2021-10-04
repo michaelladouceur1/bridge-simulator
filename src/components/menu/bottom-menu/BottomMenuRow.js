@@ -12,24 +12,20 @@ import "./BottomMenuRow.scss";
 export const BottomMenuRow = (props) => {
   const { element } = props;
 
-  const { connections, setConnections } = useContext(ElementsContext);
+  const { connections, setConnections, supports, setSupports } =
+    useContext(ElementsContext);
 
   const [rowExpanded, setRowExpanded] = useState(false);
   const [activeElement, setActiveElement] = useState(element);
 
-  const updateConnections = (element) => {
+  const updateConnections = (elementId, axis, value) => {
     const connectionsCopy = [...connections];
-    const filteredConnectionsCopy = connectionsCopy.filter(
-      (el) => el.id !== element.id
-    );
-    const finalConnections = [...filteredConnectionsCopy, element].sort(
-      (a, b) => {
-        if (a.id > b.id) return 1;
-        else return -1;
+    connectionsCopy.forEach((element) => {
+      if (element.id === elementId) {
+        element[axis] = Number(value);
       }
-    );
-    console.log(connections);
-    setConnections(finalConnections);
+    });
+    setConnections(connectionsCopy);
   };
 
   const capitalize = (value) => {
@@ -55,15 +51,11 @@ export const BottomMenuRow = (props) => {
           <input
             id="x-coord"
             value={element.x}
+            type="number"
             onChange={(event) => {
-              const elementCopy = { ...element };
-              elementCopy.x = Number(event.target.value);
-              updateConnections(elementCopy);
-              // const value = Number(event.target.value);
-              // const el = { ...activeElement };
-              // element.x = value;
-              // console.log(el);
-              // setActiveElement(el);
+              const elementId = element.id;
+              const xValue = event.target.value;
+              updateConnections(elementId, "x", xValue);
             }}
           ></input>
         </div>
@@ -72,12 +64,11 @@ export const BottomMenuRow = (props) => {
           <input
             id="y-coord"
             value={element.y}
+            type="number"
             onChange={(event) => {
-              const value = Number(event.target.value);
-              const el = { ...activeElement };
-              el.x = value;
-              console.log(el);
-              setActiveElement(el);
+              const elementId = element.id;
+              const yValue = event.target.value;
+              updateConnections(elementId, "y", yValue);
             }}
           ></input>
         </div>

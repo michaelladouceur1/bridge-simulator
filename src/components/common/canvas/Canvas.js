@@ -77,12 +77,25 @@ export const Canvas = (props) => {
     elementHover,
     setElementHover,
     moveElement,
+    setMoveElement,
   } = useContext(ElementsContext);
 
   const { isLight, contextMenu, setContextMenu } = useContext(ThemeContext);
 
   const [appliedCssClasses, setAppliedCssClasses] = useState("");
   const [mouse, setMouse] = useState({ x: undefined, y: undefined });
+
+  useEffect(() => {
+    window.addEventListener("keyup", (event) => {
+      keypressEventListeners.forEach((listener) => {
+        if (event.key === listener.key) {
+          listener.action();
+
+          return;
+        }
+      });
+    });
+  }, []);
 
   // todo
   useEffect(() => {
@@ -124,6 +137,7 @@ export const Canvas = (props) => {
 
     // todo Elements should be passed in as props
     const allElements = getAllElements();
+    console.log(allElements);
 
     // Set canvas and context; Clear canvas for new render
     const canvas = document.querySelector("canvas");
@@ -209,6 +223,15 @@ export const Canvas = (props) => {
       ctx.stroke();
       ctx.closePath();
       lines++;
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (moveElement) {
+      const contextMenuCopy = { ...contextMenu };
+      contextMenuCopy.visible = true;
+      setContextMenu(contextMenuCopy);
+      setMoveElement(undefined);
     }
   };
 
@@ -465,19 +488,13 @@ export const Canvas = (props) => {
     // console.log("\n\n\n");
   };
 
-  // * Cleanup for final version
-  // todo Event listeners should be props ie: [{key: 'c', action: ()=>setElementType('connection')}]
-  window.addEventListener("keydown", (event) => {
-    keypressEventListeners.forEach((listener) => {
-      if (event.key === listener.key) listener.action();
-    });
-  });
-
   return (
     <canvas
       className={appliedCssClasses}
       width={window.innerWidth}
       height={window.innerHeight}
+      // onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
       onClick={handleClick}
       onContextMenu={handleContextMenu}
