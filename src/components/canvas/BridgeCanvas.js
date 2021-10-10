@@ -69,6 +69,7 @@ export const BridgeCanvas = () => {
       elements: supports,
       id: "S",
       action: ({ id, placementX, placementY, scale }) => {
+        if (supports.length >= 2) return;
         setSupports([
           ...supports,
           new Support(id, placementX, placementY, scale),

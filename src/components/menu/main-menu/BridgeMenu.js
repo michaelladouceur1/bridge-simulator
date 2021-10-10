@@ -21,6 +21,8 @@ export const BridgeMenu = (props) => {
     setBeams,
     setSupports,
     setForces,
+    solve,
+    solveReactionForces,
   } = useContext(ElementsContext);
 
   const { isLight, setIsLight } = useContext(ThemeContext);
@@ -95,7 +97,14 @@ export const BridgeMenu = (props) => {
         >
           <FaTrashAlt style={{ fontSize: "1rem" }} />
         </Button>
-        <Button tooltip="Run" width="70px">
+        <Button
+          tooltip="Run"
+          width="70px"
+          onClick={() => {
+            solve();
+            solveReactionForces();
+          }}
+        >
           <VscRunAll style={{ fontSize: "1rem" }} />
         </Button>
       </div>

@@ -10,6 +10,7 @@
   "author": "Michael LaDouceur",
   "license": "ISC",
   "dependencies": {
+    "numeric": "^1.2.6",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-icons": "^4.2.0",
