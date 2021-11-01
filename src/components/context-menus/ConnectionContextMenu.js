@@ -1,5 +1,5 @@
-import { useContext } from "react";
-import { AiFillLock } from "react-icons/ai";
+import { useContext, useState, useEffect } from "react";
+import { AiFillLock, AiFillUnlock } from "react-icons/ai";
 import { FaTrashAlt } from "react-icons/fa";
 import { BsArrowsMove } from "react-icons/bs";
 
@@ -67,11 +67,20 @@ export const ConnectionContextMenu = () => {
       },
     },
     {
-      icon: <AiFillLock />,
-      tooltip: "Lock",
+      icon:
+        contextMenu.element && contextMenu.element.locked === true ? (
+          <AiFillUnlock />
+        ) : (
+          <AiFillLock />
+        ),
+      tooltip:
+        contextMenu.element && contextMenu.element.locked === true
+          ? "Unlock"
+          : "Lock",
       onClick: () => {
+        console.log("Element Locked: ", contextMenu.element.locked);
         const contextMenuCopy = { ...contextMenu };
-        contextMenuCopy.element.locked = true;
+        contextMenuCopy.element.locked = !contextMenuCopy.element.locked;
         setContextMenu(contextMenuCopy);
       },
     },

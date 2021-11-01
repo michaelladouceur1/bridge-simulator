@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 
 import { ThemeContext } from "../../../contexts/ThemeContext";
@@ -12,6 +12,11 @@ const angle = 45;
 export const ContextMenu = ({ buttons, ...args }) => {
   const { contextMenu, setContextMenu } = useContext(ThemeContext);
   const [tooltip, setTooltip] = useState(undefined);
+  const [closeButton, setCloseButton] = useState(<AiOutlineClose />);
+
+  useEffect(() => {
+    tooltip ? setCloseButton(tooltip) : setCloseButton(<AiOutlineClose />);
+  }, [tooltip]);
 
   const calculateAngle = (idx) => {
     return angle * (idx - (buttons.length - 1) / 2);
@@ -35,7 +40,7 @@ export const ContextMenu = ({ buttons, ...args }) => {
             setContextMenu(contextMenuCopy);
           }}
         >
-          {tooltip ? tooltip : <AiOutlineClose />}
+          {closeButton}
         </Button>
         {buttons.map((button, idx) => {
           const level = Math.floor(idx / (360 / angle));
